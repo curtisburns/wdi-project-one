@@ -1,0 +1,24 @@
+.game {
+  background-color: grey;
+  height: 600px;
+  width: 1000px;
+  position: relative;
+  margin: auto;
+}
+
+.player {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  background-color: black;
+  transition: all .3s ease 0s;
+  top: 250px;
+  left: 0;
+}
+
+.center {
+  height: 25px;
+  width: 25px;
+  background-color: white;
+  margin: auto;
+}
