@@ -23,3 +23,10 @@
   background-color: white;
   position: absolute;
 }
+
+.wave1 {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  background-color: red;
+}

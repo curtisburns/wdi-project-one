@@ -92,20 +92,73 @@ window.onload = () => {
   }
 
   ////////////////////////////////////////////////
-
+  ///must use the same parameters for the x and y position in order for collision to work.
   // //////////////enemy creation////////////////////
-  // function enemyFactory (enemyClass, xPos, yPos)
-  //
+  function Enemy(enemyClass, xPos, yPos) {
+    this.class = enemyClass;
+    this.left = xPos;
+    this.top = yPos;
+  }
+
+  // Number of enemys in wave 1: 8//
+
+  const wave1Enemies = [];
+  const enemyNo = 8;
+
+  function wave1() {
+    for (let i=0; i < enemyNo; i++ ) {
+      wave1Enemies[i] = new Enemy('wave1', 1000, -50);
+      // console.log(wave1Enemies);
+    }
+    let j = 0;
+    const startEnemyWave = setInterval(function() {
+      if (j<8) {
+        wave1Enemies[j].createEnemy();
+        // console.log(wave1Enemies[j]);
+        j+=1;
+      } else {
+        clearInterval(startEnemyWave);
+      }
+    },300);
+  }
 
 
 
 
 
+  Enemy.prototype.createEnemy = function() {
+    const drone = document.createElement('div');
+    drone.setAttribute('class',this.class);
+    drone.setAttribute('style','left:'+ this.left + 'px; top:' + this.top + 'px;');
+    game.appendChild(drone);
+    this.enemyPath1(drone);
+  };
+
+  Enemy.prototype.enemyPath1 = function(drone) {
+    console.log(drone.style.left);
+    const movement = setInterval(function() {
+      let enemyX = parseInt(drone.style.left);
+      let enemyY = parseInt(drone.style.top);
+      console.log(enemyX+' '+enemyY);
+
+      if(enemyY <550 && enemyX > 400) {
+        enemyX -= 50;
+        enemyY += 50;
+        drone.style.left = enemyX + 'px';
+        drone.style.top = enemyY + 'px';
+      } else if (enemyY > 0 && enemyX > -50){
+        enemyX -= 50;
+        enemyY -= 50;
+        drone.style.left = enemyX + 'px';
+        drone.style.top = enemyY + 'px';
+      } else (clearInterval(movement));
+    },300);
+
+  };
 
 
 
-
-
+  wave1();
 
 
 
