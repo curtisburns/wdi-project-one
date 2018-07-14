@@ -169,8 +169,10 @@ window.onload = () => {
         // need to add collision detection - nested if statement? New function
         //passing drone as argument.
       } else {
-        drone.parentNode.removeChild(drone);
-        clearInterval(movement);
+        if(game.children.length > 1) {
+          drone.parentNode.removeChild(drone);
+          clearInterval(movement);
+        }
       }
     },1000);
 

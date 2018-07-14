@@ -11,9 +11,7 @@
   height: 50px;
   width: 50px;
   background-color: black;
-  transition: all 0.2s ease 0s;
-  top: 250px;
-  left: 0;
+  transition: top .05s linear, left .05s linear 0s;
 }
 
 
