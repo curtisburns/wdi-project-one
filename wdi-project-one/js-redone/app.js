@@ -9,6 +9,8 @@ window.onload = () => {
 //   //this has to match the styling for the 'player' class
   const player = document.getElementsByClassName('player')[0];
   const game = document.getElementsByClassName('game')[0];
+  const score = document.getElementsByClassName('score')[0];
+  let scoreCount;
   let playerX = parseInt(player.style.left);
   let playerY = parseInt(player.style.top);
   const enemiesInPlay = [];
@@ -67,7 +69,12 @@ window.onload = () => {
 //
 //
 //   //////////////////////////////////////////////////
-//
+
+  function scoreRecord() {
+    const scoreCountString = scoreCount+'';
+    const inputScore = '0'.repeat(6-scoreCountString.length)+scoreCountString;
+    score.textContent = inputScore;
+  }
 //
 //   ///////////////////Bullet mechanics////////////////
   function Bullet(xPos,yPos,id,hitTarget) {
@@ -80,7 +87,7 @@ window.onload = () => {
   function shoot() {
     const bulletX = playerX;
     const bulletY = playerY+15;
-    const fire = new Bullet(bulletX,bulletY,bulletId, false);
+    const fire = new Bullet(bulletX,bulletY,bulletId, 1);
     bulletsInPlay.push(fire);
     const index = bulletsInPlay.length-1;
     bulletsInPlay[index].createBullet();
@@ -122,7 +129,7 @@ window.onload = () => {
   Bullet.prototype.targetCheck = function(currentBullet) {
     const _this = this;
     const hit = setInterval(function() {
-      if (_this.hitTarget===true) {
+      if (_this.hitTarget<1) {
         // console.log('I am true');
         bulletsInPlay.splice(bulletsInPlay.indexOf(_this),1);
         currentBullet.parentNode.removeChild(currentBullet);
@@ -230,13 +237,13 @@ window.onload = () => {
     const _this = this;
     const movement = setInterval(function() {
       if(_this.yPos <550 && _this.xPos > 400) {
-        _this.xPos -= 50;
-        _this.yPos += 50;
+        _this.xPos -= 12.5;
+        _this.yPos += 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if (_this.yPos >0 && _this.xPos > -50) {
-        _this.xPos -= 50;
-        _this.yPos -= 50;
+        _this.xPos -= 12.5;
+        _this.yPos -= 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 1) {
@@ -247,11 +254,13 @@ window.onload = () => {
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             drone.parentNode.removeChild(drone);
+            scoreCount+=10;
+            scoreRecord();
             clearInterval(movement);
           }
         });
       }
-    },100); //rate at which enemies
+    },100); //rate at which enemies move
   };
 
   Enemy.prototype.wave2travel = function(drone) {
@@ -259,13 +268,13 @@ window.onload = () => {
     const _this = this;
     const movement = setInterval(function() {
       if(_this.yPos <550 && _this.xPos > 400) {
-        _this.xPos -= 50;
-        _this.yPos += 50;
+        _this.xPos -= 12.5;
+        _this.yPos += 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if (_this.yPos >0 && _this.xPos > -50) {
-        _this.xPos -= 50;
-        _this.yPos -= 50;
+        _this.xPos -= 12.5;
+        _this.yPos -= 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 1) {
@@ -276,6 +285,7 @@ window.onload = () => {
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             drone.parentNode.removeChild(drone);
+
             clearInterval(movement);
           }
         });
@@ -300,19 +310,28 @@ window.onload = () => {
       bulletsInPlay.forEach(object => {
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
-          object.hitTarget = true;
+          object.hitTarget-=1;
           // console.log(object.hitTarget);
           enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
           drone.parentNode.removeChild(drone);
           // console.log(enemiesInPlay.length);
+          scoreCount+=10;
+          scoreRecord();
           clearInterval(detect);
         }
       });
-    },100);
+    },50);
     // increase for more accurate detection but be mindful of performance. Set at less than bulet/enemy movement.
   };
 
-  startWave();
+  function startGame() {
+    startWave();
+    scoreCount = 0;
+    scoreRecord();
+  }
+
+  startGame();
+
 //
 //
 //
