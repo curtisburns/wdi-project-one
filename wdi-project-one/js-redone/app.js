@@ -70,50 +70,69 @@ window.onload = () => {
 //
 //
 //   ///////////////////Bullet mechanics////////////////
-  function BulletsInPlay(xPos,yPos,id) {
+  function Bullet(xPos,yPos,id,hitTarget) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.id = id
+    this.hitTarget = hitTarget;
   }
 
   function shoot() {
     const bulletX = playerX;
     const bulletY = playerY+15;
-    const fire = new BulletsInPlay(bulletX,bulletY,bulletId);
+    const fire = new Bullet(bulletX,bulletY,bulletId, false);
     bulletsInPlay.push(fire);
     const index = bulletsInPlay.length-1;
     bulletsInPlay[index].createBullet();
   }
 
-  BulletsInPlay.prototype.createBullet = function() {
+  Bullet.prototype.createBullet = function() {
     bulletId +=1;
     const bullet = document.createElement('div');
     bullet.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     bullet.setAttribute('class', 'bullet');
     game.appendChild(bullet);
     this.travel(bullet);
-    console.log(bulletsInPlay);
+    this.targetCheck(bullet);
+    // console.log(this.hitTarget);
+    // console.log(bulletsInPlay);
   };
 
-  BulletsInPlay.prototype.travel = function(currentBullet) {
+  Bullet.prototype.travel = function(currentBullet) {
     const _this = this;
-    console.log(bulletsInPlay.indexOf(_this))
+    // console.log(bulletsInPlay.indexOf(_this))
     const travelTime = setInterval(function () {
       if(_this.xPos < 1000) {
         _this.xPos+=50;
         currentBullet.style.left = _this.xPos +'px';
       } else {
-        currentBullet.parentNode.removeChild(currentBullet);
-        console.log(bulletsInPlay.indexOf(_this));
+        // console.log(currentBullet.parentNode);
+        // console.log(bulletsInPlay.indexOf(_this));
         bulletsInPlay.forEach(object => {
           if (object.id === _this.id) {
             bulletsInPlay.splice(bulletsInPlay.indexOf(_this),1);
+            currentBullet.parentNode.removeChild(currentBullet);
           }
         });
         clearInterval(travelTime);
       }
     },50);
   };
+
+  Bullet.prototype.targetCheck = function(currentBullet) {
+    const _this = this;
+    const hit = setInterval(function() {
+      if (_this.hitTarget===true) {
+        // console.log('I am true');
+        bulletsInPlay.splice(bulletsInPlay.indexOf(_this),1);
+        currentBullet.parentNode.removeChild(currentBullet);
+        // console.log(bulletsInPlay.length);
+        // console.log(currentBullet.parentNode);
+        clearInterval(hit);
+      }
+    },50);
+  };
+
 
 
 
@@ -125,41 +144,80 @@ window.onload = () => {
     this.class = enemyClass;
     this.xPos = xPos;
     this.yPos = yPos;
-    this.id = id
+    this.id = id;
   }
 
 //can setnumber of enemies as a variable at the top if needs be later.
   function startWave() {
+    // setTimeouts within wave functions
     wave1(8);
-  // wave2();
+    wave2(10);
   // wave3();
   }
 
   function wave1(numberOfEnemies) {
-    const enemyX = 1000;
-    const enemyY = -50;
-    let i = numberOfEnemies;
-    const release = setInterval(function() {
-      if(i > 0) {
-        i-=1;
-        const birthedEnemy = new Enemy('wave1', enemyX, enemyY, enemyId);
-        enemiesInPlay.push(birthedEnemy);
-        const index = enemiesInPlay.length-1;
-        enemiesInPlay[index].createEnemy();
-      } else {
-        clearInterval(release);
-      }
-    },1000);
+    setTimeout(function() {
+      const enemyX = 1000;
+      const enemyY = -50;
+      let i = numberOfEnemies;
+      const releaseEnemy = setInterval(function() {
+        if(i > 0) {
+          i-=1;
+          const spawnedEnemy = new Enemy('wave1', enemyX, enemyY, enemyId);
+          enemiesInPlay.push(spawnedEnemy);
+          const index = enemiesInPlay.length-1;
+          enemiesInPlay[index].createWave1Enemy();
+        } else {
+          clearInterval(releaseEnemy);
+        }
+      },500 //********** rate at which wave 1 enemies spawn *************//
+      );
+    },2000 //************** delay for when wave 2 initiates *****************//
+    );
   }
 
-  Enemy.prototype.createEnemy = function() {
+  function wave2(numberOfEnemies) {
+    setTimeout(function() {
+      const enemyX = 1000;
+      const enemyY = -50;
+      let i = numberOfEnemies;
+      const releaseEnemy = setInterval(function() {
+        if(i > 0) {
+          i-=1;
+          const spawnedEnemy = new Enemy('wave2', enemyX, enemyY, enemyId);
+          enemiesInPlay.push(spawnedEnemy);
+          const index = enemiesInPlay.length-1;
+          enemiesInPlay[index].createWave2Enemy();
+        } else {
+          clearInterval(releaseEnemy);
+        }
+      },
+      500 //********** rate at which wave 2 enemies spawn *************//
+      );
+    },
+    10000 //************** delay for when wave 2 initiates *****************//
+    );
+  }
+
+  Enemy.prototype.createWave1Enemy = function() {
     enemyId +=1;
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
     game.appendChild(drone);
     // console.log(this);
-    this.travel(drone);
+    this.wave1travel(drone);
+    this.collisionDetect(drone);
+  };
+
+  Enemy.prototype.createWave2Enemy = function() {
+    enemyId +=1;
+    const drone = document.createElement('div');
+    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    drone.setAttribute('class', this.class);
+    game.appendChild(drone);
+    // console.log(this);
+    this.wave2travel(drone);
     this.collisionDetect(drone);
   };
 
@@ -167,8 +225,8 @@ window.onload = () => {
 
   //Below needs to be applied to the created enemy belonging to that object,
   //so invoke on creation.
-  Enemy.prototype.travel = function(drone) {
-    console.log(enemiesInPlay);
+  Enemy.prototype.wave1travel = function(drone) {
+    // console.log(enemiesInPlay.length);
     const _this = this;
     const movement = setInterval(function() {
       if(_this.yPos <550 && _this.xPos > 400) {
@@ -182,16 +240,47 @@ window.onload = () => {
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 1) {
-        drone.parentNode.removeChild(drone);
         enemiesInPlay.forEach(object => {
           if (object.id === _this.id) {
-            // console.log(enemiesInPlay);
+            // console.log(object.id);
+            // console.log(_this.id);
+            // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+            drone.parentNode.removeChild(drone);
             clearInterval(movement);
           }
         });
       }
-    },500);
+    },100); //rate at which enemies
+  };
+
+  Enemy.prototype.wave2travel = function(drone) {
+    // console.log(enemiesInPlay.length);
+    const _this = this;
+    const movement = setInterval(function() {
+      if(_this.yPos <550 && _this.xPos > 400) {
+        _this.xPos -= 50;
+        _this.yPos += 50;
+        drone.style.left = _this.xPos + 'px';
+        drone.style.top = _this.yPos + 'px';
+      } else if (_this.yPos >0 && _this.xPos > -50) {
+        _this.xPos -= 50;
+        _this.yPos -= 50;
+        drone.style.left = _this.xPos + 'px';
+        drone.style.top = _this.yPos + 'px';
+      } else if(game.children.length > 1) {
+        enemiesInPlay.forEach(object => {
+          if (object.id === _this.id) {
+            // console.log(object.id);
+            // console.log(_this.id);
+            // console.log(enemiesInPlay.length);
+            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+            drone.parentNode.removeChild(drone);
+            clearInterval(movement);
+          }
+        });
+      }
+    },100); //rate at which enemies
   };
 
   Enemy.prototype.collisionDetect = function(drone) {
@@ -209,23 +298,21 @@ window.onload = () => {
       // console.log('ymax:' + xMax)
       // console.log(game.children.length);
       bulletsInPlay.forEach(object => {
-        if(object.xPos <= xMax && object.xPos + 50 >= xMin && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
-          drone.parentNode.removeChild(drone);
-          bulletsInPlay.splice(bulletsInPlay.indexOf(object),1);
-          console.log(object);
-          console.log(indexOf(object));
+        if(object.xPos <= xMax && object.xPos + 50 >= xMin
+          && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
+          object.hitTarget = true;
+          // console.log(object.hitTarget);
           enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+          drone.parentNode.removeChild(drone);
+          // console.log(enemiesInPlay.length);
           clearInterval(detect);
         }
       });
-    },200);
-    // same rate at which bullet travels so every 'frame' is checked
+    },100);
+    // increase for more accurate detection but be mindful of performance. Set at less than bulet/enemy movement.
   };
-//
-//
-//
-//
-startWave();
+
+  startWave();
 //
 //
 //
