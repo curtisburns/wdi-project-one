@@ -1,7 +1,11 @@
 window.onload = () => {
 
   let bulletCount = 0;
-//////////////////////////Movement//////////////////////
+  let bulletXmin;
+  let bulletXmax;
+  let bulletYmin;
+  let bulletYmax;
+  //////////////////////////Movement//////////////////////
   //this has to match the styling for the 'player' class
   let playerX = 0;
   let playerY = 250;
@@ -16,7 +20,7 @@ window.onload = () => {
     if (e.key === 'ArrowRight') {
       if(playerX < 950) {
         playerX+=50;
-        console.log(playerX);
+        // console.log(playerX);
         player.style.left = playerX + 'px';
       }
     }
@@ -24,7 +28,7 @@ window.onload = () => {
     if (e.key === 'ArrowDown') {
       if(playerY < 550) {
         playerY+=50;
-        console.log(playerY);
+        // console.log(playerY);
         player.style.top = playerY + 'px';
       }
     }
@@ -32,7 +36,7 @@ window.onload = () => {
     if (e.key === 'ArrowLeft') {
       if(playerX > 0) {
         playerX-=50;
-        console.log(playerX);
+        // console.log(playerX);
         player.style.left = playerX + 'px';
       }
     }
@@ -40,17 +44,17 @@ window.onload = () => {
     if (e.key === 'ArrowUp') {
       if(playerY > 0) {
         playerY-=50;
-        console.log(playerY);
+        // console.log(playerY);
         player.style.top = playerY + 'px';
       }
     }
     //Current player coordinates
-    console.log('X:' + playerX + ', Y: ' + playerY);
+    // console.log('X:' + playerX + ', Y: ' + playerY);
     /////////////////////////////////////////////////////////
 
     //************Shoot*******************///
     if (e.key === ' ') {
-      console.log(e.key);
+      // console.log(e.key);
       shoot();
       //*1 showBullets();
 
@@ -64,7 +68,7 @@ window.onload = () => {
   ///////////////////Bullet mechanics////////////////
   function shoot() {
     const bulletX = playerX + 'px';
-    const bulletY = playerY+25 + 'px';
+    const bulletY = playerY+15 + 'px';
 
     const bullet = document.createElement('div');
     bullet.setAttribute('style', 'top:' + bulletY +';' + 'left:' + bulletX +';');
@@ -75,12 +79,17 @@ window.onload = () => {
   }
 
   function travel(currentBullet) {
-    console.log(parseInt(currentBullet.style.left));
-    console.log(playerX + 'px');
+    // console.log(parseInt(currentBullet.style.left));
+    // console.log(playerX + 'px');
     let travelX = playerX;
     const travelTime = setInterval(function () {
       if(travelX < 1000) {
-        console.log(travelX);
+        bulletXmin = parseInt(currentBullet.style.left);
+        bulletXmax = parseInt(currentBullet.style.left) + currentBullet.offsetWidth;
+        bulletYmin = parseInt(currentBullet.style.top);
+        bulletYmax = parseInt(currentBullet.style.top) + currentBullet.offsetHeight;
+
+        // console.log(travelX);
         travelX+=50;
         currentBullet.style.left = travelX + 'px';
       } else {
@@ -88,7 +97,8 @@ window.onload = () => {
         clearInterval(travelTime);
       }
 
-    },50);
+
+    },200);
   }
 
   ////////////////////////////////////////////////
@@ -118,8 +128,9 @@ window.onload = () => {
         j+=1;
       } else {
         clearInterval(startEnemyWave);
+
       }
-    },300);
+    },1000);
   }
 
 
@@ -132,14 +143,16 @@ window.onload = () => {
     drone.setAttribute('style','left:'+ this.left + 'px; top:' + this.top + 'px;');
     game.appendChild(drone);
     this.enemyPath1(drone);
+    this.collisionDetect(drone);
   };
-
+  //Below needs to be applied to the created enemy belonging to that object,
+  //so invoke on creation.
   Enemy.prototype.enemyPath1 = function(drone) {
-    console.log(drone.style.left);
+    // console.log(drone.style.left);
     const movement = setInterval(function() {
       let enemyX = parseInt(drone.style.left);
       let enemyY = parseInt(drone.style.top);
-      console.log(enemyX+' '+enemyY);
+      // console.log(enemyX+' '+enemyY);
 
       if(enemyY <550 && enemyX > 400) {
         enemyX -= 50;
@@ -151,15 +164,41 @@ window.onload = () => {
         enemyY -= 50;
         drone.style.left = enemyX + 'px';
         drone.style.top = enemyY + 'px';
-      } else (clearInterval(movement));
-    },300);
+
+        // can initiate sounds here
+        // need to add collision detection - nested if statement? New function
+        //passing drone as argument.
+      } else {
+        drone.parentNode.removeChild(drone);
+        clearInterval(movement);
+      }
+    },1000);
 
   };
 
-
-
   wave1();
 
+  Enemy.prototype.collisionDetect = function(drone) {
+    const detect = setInterval(function() {
+      // console.log(drone.offsetWidth);
+      const Xmin = parseInt(drone.style.left);
+      const Xmax = parseInt(drone.style.left) + drone.offsetWidth;
+      const Ymin = parseInt(drone.style.top);
+      const Ymax = parseInt(drone.style.top) + drone.offsetHeight;
+      console.log('bulletYmin:' + bulletYmin);
+      // console.log('droneYmin: ' + Ymin);
+      console.log('bulletYmin:' + bulletYmax);
+      // console.log('droneYmax: ' + Ymax);
+      console.log(game.children.length)
+      if (bulletXmax >= Xmin && bulletYmin <= Ymax && bulletYmin >= Ymin) {
+        drone.parentNode.removeChild(drone);
+      }
+      if (game.children.length <= 1) {
+        clearInterval(detect);
+      }
+    },200);
+    // same rate at which bullet travels so every 'frame' is checked
+  };
 
 
 
