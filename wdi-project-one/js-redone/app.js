@@ -184,7 +184,7 @@ window.onload = () => {
     this.lifePoints = lifePoints;
   }
 
-  function startplayer1Life() {
+  function startPlayer1Life() {
     if(player1Lives > 0) {
       const player1X = 0;
       const player1Y = 250;
@@ -201,7 +201,7 @@ window.onload = () => {
     }
   }
 
-  function startplayer2Life() {
+  function startPlayer2Life() {
     if(player2Lives > 0) {
       const player2X = 0;
       const player2Y = 250;
@@ -245,7 +245,7 @@ window.onload = () => {
         // console.log('I am true');
         playerElement.parentNode.removeChild(playerElement);
         clearInterval(hit);
-        startplayer1Life();
+        startPlayer1Life();
       }
     },50);
   };
@@ -257,7 +257,7 @@ window.onload = () => {
         // console.log('I am true');
         playerElement.parentNode.removeChild(playerElement);
         clearInterval(hit);
-        startplayer2Life();
+        startPlayer2Life();
       }
     },50);
   };
@@ -416,14 +416,20 @@ window.onload = () => {
   }
 
   //can setnumber of enemies as a variable at the top if needs be later.
-  function startWave() {
-    // setTimeouts within wave functions
-    wave1(8);
-    wave2(10);
+  function startWaves() {
+    //level creation
+    // numberOfEnemies, delay
+    wave1(8,2000);
+    wave2(10,10000);
+    wave2(14,20000);
+    wave1(8,25000);
+    wave2(14,32000);
+    wave1(8,40000);
+
   // wave3();
   }
 
-  function wave1(numberOfEnemies) {
+  function wave1(numberOfEnemies,delay) {
     setTimeout(function() {
       const enemyX = 1000;
       const enemyY = -37.5;
@@ -443,16 +449,16 @@ window.onload = () => {
         }
       },500 //********** rate at which wave 1 enemies spawn *************//
       );
-    },2000 //************** delay for when wave 2 initiates *****************//
+    },delay //************** delay for when wave 2 initiates *****************//
     );
   }
 
-  function wave2(numberOfEnemies) {
+  function wave2(numberOfEnemies,delay) {
     setTimeout(function() {
       const enemyX = 1000;
-      const enemyY = -37.5;
+      const enemyY = 575;
       const lifePoints = 2;
-      const score = 20;
+      const score = 25;
       let i = numberOfEnemies;
       const releaseEnemy = setInterval(function() {
         if(i > 0) {
@@ -468,7 +474,7 @@ window.onload = () => {
       500 //********** rate at which wave 2 enemies spawn *************//
       );
     },
-    10000 //************** delay for when wave 2 initiates *****************//
+    delay //************** delay for when wave 2 initiates *****************//
     );
   }
 
@@ -479,7 +485,7 @@ window.onload = () => {
     drone.setAttribute('class', this.class);
     game.appendChild(drone);
     // console.log(this);
-    this.wave1travel(drone);
+    this.wave1Travel(drone);
     this.collisionDetect(drone);
   };
 
@@ -490,7 +496,7 @@ window.onload = () => {
     drone.setAttribute('class', this.class);
     game.appendChild(drone);
     // console.log(this);
-    this.wave2travel(drone);
+    this.wave2Travel(drone);
     this.collisionDetect(drone);
   };
 
@@ -498,16 +504,17 @@ window.onload = () => {
 
   //Below needs to be applied to the created enemy belonging to that object,
   //so invoke on creation.
-  Enemy.prototype.wave1travel = function(drone) {
+  Enemy.prototype.wave1Travel = function(drone) {
     // console.log(enemiesInPlay.length);
     const _this = this;
     const movement = setInterval(function() {
-      if(_this.yPos <550 && _this.xPos > 400) {
+      //starting xPos is 1000
+      if(_this.xPos > 400) {
         _this.xPos -= 12.5;
         _this.yPos += 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
-      } else if (_this.yPos >0 && _this.xPos > -37.5) {
+      } else if (_this.xPos > -37.5) {
         _this.xPos -= 12.5;
         _this.yPos -= 12.5;
         drone.style.left = _this.xPos + 'px';
@@ -527,18 +534,19 @@ window.onload = () => {
     },100); //rate at which enemies move
   };
 
-  Enemy.prototype.wave2travel = function(drone) {
+  Enemy.prototype.wave2Travel = function(drone) {
     // console.log(enemiesInPlay.length);
     const _this = this;
     const movement = setInterval(function() {
-      if(_this.yPos <550 && _this.xPos > 400) {
-        _this.xPos -= 12.5;
-        _this.yPos += 12.5;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if (_this.yPos >0 && _this.xPos > -37.5) {
+      //starting xPos is 1000
+      if(_this.xPos > 400) {
         _this.xPos -= 12.5;
         _this.yPos -= 12.5;
+        drone.style.left = _this.xPos + 'px';
+        drone.style.top = _this.yPos + 'px';
+      } else if (_this.xPos > -37.5) {
+        _this.xPos -= 12.5;
+        _this.yPos += 12.5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 0) {
@@ -658,16 +666,16 @@ window.onload = () => {
   };
 
 
-//////////////////////////Start Game///////////////////////////////////////////
+  //////////////////////////Start Game///////////////////////////////////////////
   function startGame() {
-    startWave();
+    startWaves();
     p1ScoreCount = 0;
     p2ScoreCount = 0;
     p1UpdateScore();
     p2UpdateScore();
-    startplayer1Life();
+    startPlayer1Life();
     if (player2Mode === true) {
-      startplayer2Life();
+      startPlayer2Life();
     }
   }
 
