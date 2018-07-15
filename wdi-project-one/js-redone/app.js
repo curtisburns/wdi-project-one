@@ -1,64 +1,78 @@
 window.onload = () => {
 //
 
+
+///////////NOTES//////////////
+//known issue where if player spams bullets at high rate, cannot remove drone. this
+//is because the detection rate is too slow and two bullets can enter the position of the drone
+//and therefore fucntion tries to remove the same drone twice. increase detection rate?
+//////////////////////////////
+
 //   ////////////////Declarations///////////////////////
   const game = document.getElementsByClassName('game')[0];
-  const score = document.getElementsByClassName('score')[0];
-  let scoreCount;
-  let livesUsed = 0;
+  let player2Mode = false; //will be included in intro so player can select.
+  const p1Score = document.getElementsByClassName('p1-score')[0];
+  const p2Score = document.getElementsByClassName('p2-score')[0];
+  let p1ScoreCount;
+  let p2ScoreCount;
+  let p1LivesUsed = 0;
+  let p2LivesUsed = 0;
   const enemiesInPlay = [];
-  const bulletsInPlay = [];
-  const playerRecord = [];
+  const p1BulletsInPlay = [];
+  const p2BulletsInPlay = [];
+  const player1Record = [];
+  const player2Record = [];
   let bulletId = 0;
   let enemyId = 0;
   let player1Lives = 3;
-  //This has been declared last as it didn't work until the player was created.
-  //let as this is reassigned to the new player created.
+  let player2Lives = 3;
+  //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
+  let player2;
   //   //////////////////////////////////////////////////////
-  //   //////////////////////////Movement//////////////////////
+  //   //////////////////////////player 1 Movement//////////////////////
 
-  window.addEventListener('keydown', checkKeys);
+  window.addEventListener('keydown', p1CheckKeys);
 
-  function checkKeys(e) {
-    const player1Index = livesUsed;
+  function p1CheckKeys(e) {
+    const player1Index = p1LivesUsed;
     // right
     if (e.key === 'ArrowRight') {
       //if statement fixes errors for when player is not in DOM (frames between lives)
-      if(playerRecord[player1Index]) {
-        if(playerRecord[player1Index].xPos < 950) {
-          playerRecord[player1Index].xPos+=50;
-          player1.style.left = playerRecord[player1Index].xPos + 'px';
+      if(player1Record[player1Index]) {
+        if(player1Record[player1Index].xPos < 950) {
+          player1Record[player1Index].xPos+=50;
+          player1.style.left = player1Record[player1Index].xPos + 'px';
         }
       }
     }
     // down
     if (e.key === 'ArrowDown') {
-      if(playerRecord[player1Index]) {
-        if(playerRecord[player1Index].yPos < 550) {
-          playerRecord[player1Index].yPos+=50;
+      if(player1Record[player1Index]) {
+        if(player1Record[player1Index].yPos < 550) {
+          player1Record[player1Index].yPos+=50;
           // console.log(playerY);
-          player1.style.top = playerRecord[player1Index].yPos + 'px';
+          player1.style.top = player1Record[player1Index].yPos + 'px';
         }
       }
     }
     // left
     if (e.key === 'ArrowLeft') {
-      if(playerRecord[player1Index]) {
-        if(playerRecord[player1Index].xPos > 0) {
-          playerRecord[player1Index].xPos-=50;
+      if(player1Record[player1Index]) {
+        if(player1Record[player1Index].xPos > 0) {
+          player1Record[player1Index].xPos-=50;
           // console.log(playerX);
-          player1.style.left = playerRecord[player1Index].xPos + 'px';
+          player1.style.left = player1Record[player1Index].xPos + 'px';
         }
       }
     }
     // up
     if (e.key === 'ArrowUp') {
-      if(playerRecord[player1Index]) {
-        if(playerRecord[player1Index].yPos > 0) {
-          playerRecord[player1Index].yPos-=50;
+      if(player1Record[player1Index]) {
+        if(player1Record[player1Index].yPos > 0) {
+          player1Record[player1Index].yPos-=50;
           // console.log(playerY);
-          player1.style.top = playerRecord[player1Index].yPos + 'px';
+          player1.style.top = player1Record[player1Index].yPos + 'px';
         }
       }
     }
@@ -67,11 +81,70 @@ window.onload = () => {
     /////////////////////////////////////////////////////////
 
     //************Shoot*******************///
-    if (e.key === ' ') {
-      if(playerRecord[player1Index]) {
+    if (e.key === 'm') {
+      if(player1Record[player1Index]) {
       // console.log(e.key);
-        shoot();
+        p1ShootNormal();
       //*1 showBullets();
+      }
+    }
+  }
+
+  //   //////////////////////////player 2 Movement//////////////////////
+  window.addEventListener('keydown', p2CheckKeys);
+
+  function p2CheckKeys(e) {
+    console.log(e.key);
+    const player2Index = p2LivesUsed;
+    // right
+    if (e.key === 'd') {
+      //if statement fixes errors for when player is not in DOM (frames between lives)
+      if(player2Record[player2Index]) {
+        if(player2Record[player2Index].xPos < 950) {
+          player2Record[player2Index].xPos+=50;
+          player2.style.left = player2Record[player2Index].xPos + 'px';
+        }
+      }
+    }
+    // down
+    if (e.key === 's') {
+      if(player2Record[player2Index]) {
+        if(player2Record[player2Index].yPos < 550) {
+          player2Record[player2Index].yPos+=50;
+          // console.log(playerY);
+          player2.style.top = player2Record[player2Index].yPos + 'px';
+        }
+      }
+    }
+    // left
+    if (e.key === 'a') {
+      if(player2Record[player2Index]) {
+        if(player2Record[player2Index].xPos > 0) {
+          player2Record[player2Index].xPos-=50;
+          // console.log(playerX);
+          player2.style.left = player2Record[player2Index].xPos + 'px';
+        }
+      }
+    }
+    // up
+    if (e.key === 'w') {
+      if(player2Record[player2Index]) {
+        if(player2Record[player2Index].yPos > 0) {
+          player2Record[player2Index].yPos-=50;
+          // console.log(playerY);
+          player2.style.top = player2Record[player2Index].yPos + 'px';
+        }
+      }
+    }
+
+    /////////////////////////////////////////////////////////
+
+    //************Shoot*******************///
+    if (e.key === 'c') {
+      if(player2Record[player2Index]) {
+        // console.log(e.key);
+        p2ShootNormal();
+        //*1 showBullets();
       }
     }
   }
@@ -79,10 +152,16 @@ window.onload = () => {
 
   //////////////////////////////////////////////////
   //////////////////////score/////////////////////////
-  function updateScore() {
-    const scoreCountString = scoreCount+'';
+  function p1UpdateScore() {
+    const scoreCountString = p1ScoreCount+'';
     const inputScore = '0'.repeat(6-scoreCountString.length)+scoreCountString;
-    score.textContent = inputScore;
+    p1Score.textContent = inputScore;
+  }
+
+  function p2UpdateScore() {
+    const scoreCountString = p2ScoreCount+'';
+    const inputScore = '0'.repeat(6-scoreCountString.length)+scoreCountString;
+    p2Score.textContent = inputScore;
   }
   /////////////////////////////////////////////////////
   ///////////////////////Player////////////////////
@@ -115,70 +194,137 @@ window.onload = () => {
       const powerUp = 'none';
       const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
       //started a record of playerStats
-      playerRecord.push(life);
-      console.log(playerRecord);
-      const index = playerRecord.length-1;
-      playerRecord[index].createPlayer();
+      player1Record.push(life);
+      console.log(player1Record);
+      const index = player1Record.length-1;
+      player1Record[index].createPlayer1();
     }
   }
 
-  Player.prototype.createPlayer = function() {
+  function startplayer2Life() {
+    if(player2Lives > 0) {
+      const player2X = 0;
+      const player2Y = 250;
+      const playerTravelled = 0;
+      const enemiesKilled = 0;
+      const lifePoints = 1;
+      const powerUp = 'none';
+      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
+      //started a record of playerStats
+      player2Record.push(life);
+      console.log(player2Record);
+      const index = player2Record.length-1;
+      player2Record[index].createPlayer2();
+    }
+  }
+
+  Player.prototype.createPlayer1 = function() {
     const playerElement = document.createElement('div');
     playerElement.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     playerElement.setAttribute('class', this.class);
     game.appendChild(playerElement);
     player1 = document.getElementsByClassName('player1')[0];
-    this.playerHitBox(playerElement);
+    this.player1HitBox(playerElement);
 
   };
 
-  Player.prototype.playerHitBox = function(playerElement) {
+  Player.prototype.createPlayer2 = function() {
+    const playerElement = document.createElement('div');
+    playerElement.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    playerElement.setAttribute('class', this.class);
+    game.appendChild(playerElement);
+    player2 = document.getElementsByClassName('player2')[0];
+    this.player2HitBox(playerElement);
+
+  };
+
+  Player.prototype.player1HitBox = function(playerElement) {
     const _this = this;
     const hit = setInterval(function() {
       if (_this.lifePoints<1) {
         // console.log('I am true');
         playerElement.parentNode.removeChild(playerElement);
-        // console.log(bulletsInPlay.length);
-        // console.log(currentBullet.parentNode);
         clearInterval(hit);
         startplayer1Life();
       }
     },50);
   };
 
+  Player.prototype.player2HitBox = function(playerElement) {
+    const _this = this;
+    const hit = setInterval(function() {
+      if (_this.lifePoints<1) {
+        // console.log('I am true');
+        playerElement.parentNode.removeChild(playerElement);
+        clearInterval(hit);
+        startplayer2Life();
+      }
+    },50);
+  };
+
   ///////////////////////////////////////////////////////
-  ///////////////////Bullet mechanics////////////////
-  function Bullet(xPos,yPos,id,hitTarget) {
+
+
+
+
+
+  ///////////////////Bullet mechanics//////////////////////////////////////////
+  function Bullet(xPos,yPos,id,hitPoints) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.id = id;
-    this.hitTarget = hitTarget;
+    this.hitPoints = hitPoints;
   }
 
-  function shoot() {
+  function p1ShootNormal() {
     //index focuses on the last player created
-    const player1Index = livesUsed;
-    const bulletX = playerRecord[player1Index].xPos;
-    const bulletY = playerRecord[player1Index].yPos+15;
-    const fire = new Bullet(bulletX,bulletY,bulletId, 1);
-    bulletsInPlay.push(fire);
-    const index = bulletsInPlay.length-1;
-    bulletsInPlay[index].createBullet();
+    const player1Index = p1LivesUsed;
+    const bulletX = player1Record[player1Index].xPos;
+    const bulletY = player1Record[player1Index].yPos+15;
+    const hitPoints = 1;
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    p1BulletsInPlay.push(fire);
+    const index = p1BulletsInPlay.length-1;
+    p1BulletsInPlay[index].p1CreateBullet();
   }
 
-  Bullet.prototype.createBullet = function() {
+  function p2ShootNormal() {
+    //index focuses on the last player created
+    const player2Index = p2LivesUsed;
+    const bulletX = player2Record[player2Index].xPos;
+    const bulletY = player2Record[player2Index].yPos+15;
+    const hitPoints = 1;
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    p2BulletsInPlay.push(fire);
+    const index = p2BulletsInPlay.length-1;
+    p2BulletsInPlay[index].p2CreateBullet();
+  }
+
+  Bullet.prototype.p1CreateBullet = function() {
     bulletId +=1;
     const bullet = document.createElement('div');
     bullet.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     bullet.setAttribute('class', 'bullet');
     game.appendChild(bullet);
-    this.travel(bullet);
-    this.targetCheck(bullet);
+    this.p1Travel(bullet);
+    this.p1TargetCheck(bullet);
     // console.log(this.hitTarget);
     // console.log(bulletsInPlay);
   };
 
-  Bullet.prototype.travel = function(currentBullet) {
+  Bullet.prototype.p2CreateBullet = function() {
+    bulletId +=1;
+    const bullet = document.createElement('div');
+    bullet.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    bullet.setAttribute('class', 'bullet');
+    game.appendChild(bullet);
+    this.p2Travel(bullet);
+    this.p2TargetCheck(bullet);
+    // console.log(this.hitTarget);
+    // console.log(bulletsInPlay);
+  };
+
+  Bullet.prototype.p1Travel = function(currentBullet) {
     const _this = this;
     // console.log(bulletsInPlay.indexOf(_this))
     const travelTime = setInterval(function () {
@@ -188,9 +334,9 @@ window.onload = () => {
       } else {
         // console.log(currentBullet.parentNode);
         // console.log(bulletsInPlay.indexOf(_this));
-        bulletsInPlay.forEach(object => {
+        p1BulletsInPlay.forEach(object => {
           if (object.id === _this.id) {
-            bulletsInPlay.splice(bulletsInPlay.indexOf(_this),1);
+            p1BulletsInPlay.splice(p1BulletsInPlay.indexOf(_this),1);
             currentBullet.parentNode.removeChild(currentBullet);
           }
         });
@@ -199,12 +345,47 @@ window.onload = () => {
     },50);
   };
 
-  Bullet.prototype.targetCheck = function(currentBullet) {
+  Bullet.prototype.p2Travel = function(currentBullet) {
+    const _this = this;
+    // console.log(bulletsInPlay.indexOf(_this))
+    const travelTime = setInterval(function () {
+      if(_this.xPos < 1000) {
+        _this.xPos+=50;
+        currentBullet.style.left = _this.xPos +'px';
+      } else {
+        // console.log(currentBullet.parentNode);
+        // console.log(bulletsInPlay.indexOf(_this));
+        p2BulletsInPlay.forEach(object => {
+          if (object.id === _this.id) {
+            p2BulletsInPlay.splice(p2BulletsInPlay.indexOf(_this),1);
+            currentBullet.parentNode.removeChild(currentBullet);
+          }
+        });
+        clearInterval(travelTime);
+      }
+    },50);
+  };
+
+  Bullet.prototype.p1TargetCheck = function(currentBullet) {
     const _this = this;
     const hit = setInterval(function() {
-      if (_this.hitTarget<1) {
+      if (_this.hitPoints<1) {
         // console.log('I am true');
-        bulletsInPlay.splice(bulletsInPlay.indexOf(_this),1);
+        p1BulletsInPlay.splice(p1BulletsInPlay.indexOf(_this),1);
+        currentBullet.parentNode.removeChild(currentBullet);
+        // console.log(bulletsInPlay.length);
+        // console.log(currentBullet.parentNode);
+        clearInterval(hit);
+      }
+    },50);
+  };
+
+  Bullet.prototype.p2TargetCheck = function(currentBullet) {
+    const _this = this;
+    const hit = setInterval(function() {
+      if (_this.hitPoints<1) {
+        // console.log('I am true');
+        p2BulletsInPlay.splice(p2BulletsInPlay.indexOf(_this),1);
         currentBullet.parentNode.removeChild(currentBullet);
         // console.log(bulletsInPlay.length);
         // console.log(currentBullet.parentNode);
@@ -216,15 +397,22 @@ window.onload = () => {
 
 
 
+  /////////////////////////////////////////////////////////////////////////////
 
-  ////////////////////////////////////////////////
-  ///must use the same parameters for the x and y position in order for collision to work.
-  // //////////////enemy creation////////////////////
-  function Enemy(enemyClass, xPos, yPos, id) {
+
+
+
+
+
+  //////////////////////////////enemy creation//////////////////////////////////
+  function Enemy(enemyClass, xPos, yPos, id, lifePoints, score) {
     this.class = enemyClass;
     this.xPos = xPos;
     this.yPos = yPos;
     this.id = id;
+    this.lifePoints = lifePoints;
+    this.score = score;
+
   }
 
   //can setnumber of enemies as a variable at the top if needs be later.
@@ -239,11 +427,14 @@ window.onload = () => {
     setTimeout(function() {
       const enemyX = 1000;
       const enemyY = -37.5;
+      const lifePoints = 1;
+      const score = 10;
       let i = numberOfEnemies;
       const releaseEnemy = setInterval(function() {
         if(i > 0) {
           i-=1;
-          const spawnedEnemy = new Enemy('wave1', enemyX, enemyY, enemyId);
+          const spawnedEnemy = new Enemy('wave1', enemyX, enemyY, enemyId, lifePoints , score);
+          console.log(spawnedEnemy);
           enemiesInPlay.push(spawnedEnemy);
           const index = enemiesInPlay.length-1;
           enemiesInPlay[index].createWave1Enemy();
@@ -260,11 +451,13 @@ window.onload = () => {
     setTimeout(function() {
       const enemyX = 1000;
       const enemyY = -37.5;
+      const lifePoints = 2;
+      const score = 20;
       let i = numberOfEnemies;
       const releaseEnemy = setInterval(function() {
         if(i > 0) {
           i-=1;
-          const spawnedEnemy = new Enemy('wave2', enemyX, enemyY, enemyId);
+          const spawnedEnemy = new Enemy('wave2', enemyX, enemyY, enemyId, lifePoints, score);
           enemiesInPlay.push(spawnedEnemy);
           const index = enemiesInPlay.length-1;
           enemiesInPlay[index].createWave2Enemy();
@@ -368,7 +561,8 @@ window.onload = () => {
     //index focuses on the last player created
     const _this = this;
     const detect = setInterval(function() {
-      const player1Index = livesUsed;
+      const player1Index = p1LivesUsed;
+      const player2Index = p2LivesUsed;
       // console.log(drone.offsetWidth);
       const xMin = _this.xPos;
       const xMax = _this.xPos + drone.offsetWidth;
@@ -382,39 +576,80 @@ window.onload = () => {
       // console.log(game.children.length);
 
       //bullet collision//
-      bulletsInPlay.forEach(object => {
+      p1BulletsInPlay.forEach(object => {
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
-          object.hitTarget-=1;
+          _this.lifePoints-=object.hitPoints;
+          object.hitPoints-=1;
           // console.log(object.hitTarget);
-          enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-          drone.parentNode.removeChild(drone);
-          // console.log(enemiesInPlay.length);
-          //need to tie this variable to a score increment unique to the wave of enemies
-          scoreCount+=10;
-          ///////////////////////////////////////////////
-          updateScore();
-          clearInterval(detect);
+          if(_this.lifePoints === 0) {
+            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+            drone.parentNode.removeChild(drone);
+            // console.log(enemiesInPlay.length);
+            p1ScoreCount+=_this.score;
+            ///////////////////////////////////////////////
+            p1UpdateScore();
+            clearInterval(detect);
+          }
         }
       });
-      //player collision//
-      //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
-      if(playerRecord[player1Index]) {
-        if(playerRecord[player1Index].xPos <= xMax && playerRecord[player1Index].xPos + 50 >= xMin
-          && playerRecord[player1Index].yPos <= yMax && playerRecord[player1Index].yPos + 10 >= yMin){
-          playerRecord[player1Index].lifePoints -= 1;
-          //set position to null on death as enemys may continue to fly through and lower the score.
-          playerRecord[player1Index].xPos = null;
-          playerRecord[player1Index].yPos = null;
-          if(scoreCount-100>0) {
-            scoreCount-=100;
-            updateScore();
-          } else {
-            scoreCount-=scoreCount;
-            updateScore();
+
+      p2BulletsInPlay.forEach(object => {
+        if(object.xPos <= xMax && object.xPos + 50 >= xMin
+          && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
+          _this.lifePoints-=object.hitPoints;
+          object.hitPoints-=1;
+          // console.log(object.hitTarget);
+          if(_this.lifePoints === 0) {
+            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+            drone.parentNode.removeChild(drone);
+            // console.log(enemiesInPlay.length);
+            p2ScoreCount+=_this.score;
+            ///////////////////////////////////////////////
+            p2UpdateScore();
+            clearInterval(detect);
           }
-          livesUsed+=1;
+        }
+      });
+
+      //***************//player1 collision//******************///
+      //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
+      if(player1Record[player1Index]) {
+        if(player1Record[player1Index].xPos <= xMax && player1Record[player1Index].xPos + 50 >= xMin
+          && player1Record[player1Index].yPos <= yMax && player1Record[player1Index].yPos + 10 >= yMin){
+          player1Record[player1Index].lifePoints -= 1;
+          //set position to null on death as enemys may continue to fly through and lower the score.
+          player1Record[player1Index].xPos = null;
+          player1Record[player1Index].yPos = null;
+          if(p1ScoreCount-100>0) {
+            p1ScoreCount-=100;
+            p1UpdateScore();
+          } else {
+            p1ScoreCount-=p1ScoreCount;
+            p1UpdateScore();
+          }
+          p1LivesUsed+=1;
           player1Lives -= 1;
+        }
+      }
+      //***************//player2 collision//******************///
+      //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
+      if(player2Record[player2Index]) {
+        if(player2Record[player2Index].xPos <= xMax && player2Record[player2Index].xPos + 50 >= xMin
+          && player2Record[player2Index].yPos <= yMax && player2Record[player2Index].yPos + 10 >= yMin){
+          player2Record[player2Index].lifePoints -= 1;
+          //set position to null on death as enemys may continue to fly through and lower the score.
+          player2Record[player2Index].xPos = null;
+          player2Record[player2Index].yPos = null;
+          if(p2ScoreCount-100>0) {
+            p2ScoreCount-=100;
+            p2UpdateScore();
+          } else {
+            p2ScoreCount-=p2ScoreCount;
+            p2UpdateScore();
+          }
+          p2LivesUsed+=1;
+          player2Lives -= 1;
         }
       }
     },
@@ -422,11 +657,18 @@ window.onload = () => {
     );
   };
 
+
+//////////////////////////Start Game///////////////////////////////////////////
   function startGame() {
     startWave();
-    scoreCount = 0;
-    updateScore();
+    p1ScoreCount = 0;
+    p2ScoreCount = 0;
+    p1UpdateScore();
+    p2UpdateScore();
     startplayer1Life();
+    if (player2Mode === true) {
+      startplayer2Life();
+    }
   }
 
   startGame();

@@ -14,6 +14,13 @@
   transition: top .05s linear, left .05s linear 0s;
 }
 
+.player2 {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  background-color: blue;
+  transition: top .05s linear, left .05s linear 0s;
+}
 
 
 .bullet {
