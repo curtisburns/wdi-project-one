@@ -23,10 +23,28 @@
 }
 
 
-.bullet {
+.bulletLvl1 {
   height: 10px;
   width: 50px;
   background-color: white;
+  position: absolute;
+}
+.bulletLvl2 {
+  height: 10px;
+  width: 50px;
+  background-color: yellow;
+  position: absolute;
+}
+.bulletLvl3 {
+  height: 10px;
+  width: 50px;
+  background-color: red;
+  position: absolute;
+}
+.bulletLvlMax {
+  height: 10px;
+  width: 50px;
+  background-color: blue;
   position: absolute;
 }
 
@@ -41,5 +59,12 @@
   position: absolute;
   height: 50px;
   width: 50px;
-  background-color: red;
+  background-color: brown;
+}
+
+.wave3 {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  background-color: orange;
 }

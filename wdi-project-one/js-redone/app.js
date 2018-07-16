@@ -6,11 +6,14 @@ window.onload = () => {
 //known issue where if player spams bullets at high rate, cannot remove drone. this
 //is because the detection rate is too slow and two bullets can enter the position of the drone
 //and therefore fucntion tries to remove the same drone twice. increase detection rate?
+
+//NEED TO FIX BULLET CHARGE INTERVAL, Charge doesnt work as keydown is cancelled on press of other buttons.
+//Need to push to an array. Need to separate functions from input, then activate those functions via the array.
 //////////////////////////////
 
 //   ////////////////Declarations///////////////////////
   const game = document.getElementsByClassName('game')[0];
-  let player2Mode = true; //will be included in intro so player can select.
+  let player2Mode = false; //will be included in intro so player can select.
   const p1Score = document.getElementsByClassName('p1-score')[0];
   const p2Score = document.getElementsByClassName('p2-score')[0];
   let p1ScoreCount;
@@ -27,11 +30,11 @@ window.onload = () => {
   let player1Lives = 3;
   let player2Lives = 3;
   let p1DefaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
-  let p1ShotPower = 0
+  let p1ShotPower = 0;
   let p1TriggerPulled = false; //This can be used to effect powerUps e.g 3 for a period of time;
   let p2DefaultShotPower = 0;
   let p2TriggerPulled = false;
-  let p2ShotPower = 0
+  let p2ShotPower = 0;
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
   let player2;
@@ -93,15 +96,17 @@ window.onload = () => {
       // console.log(e.key);
         if(p1TriggerPulled === false) {
           p1ChargeShot();
+
         }
-        p1TriggerPulled = true;
       //*1 showBullets();
       }
     }
+    p1TriggerPulled = true;
   }
   window.addEventListener('keyup', p1CheckKeyUp);
 
   function p1CheckKeyUp(e) {
+
     const player1Index = p1LivesUsed;
     if (e.key === 'm') {
       if(player1Record[player1Index]) {
@@ -109,10 +114,10 @@ window.onload = () => {
         if(p1TriggerPulled === true) {
           p1FireShot();
         }
-        p1TriggerPulled = false;
       //*1 showBullets();
       }
     }
+    p1TriggerPulled = false;
   }
   //   //////////////////////////player 2 Movement//////////////////////
   window.addEventListener('keydown', p2CheckKeyDown);
@@ -164,15 +169,34 @@ window.onload = () => {
     /////////////////////////////////////////////////////////
 
     //************Shoot*******************///
-    if (e.key === 'c') {
+    if (e.key === 'm') {
       if(player2Record[player2Index]) {
-        // console.log(e.key);
-        p2ShootNormal();
-        //*1 showBullets();
+      // console.log(e.key);
+        if(p2TriggerPulled === false) {
+          p2ChargeShot();
+
+        }
+      //*1 showBullets();
       }
     }
+    p2TriggerPulled = true;
   }
+  window.addEventListener('keyup', p2CheckKeyUp);
 
+  function p2CheckKeyUp(e) {
+
+    const player2Index = p2LivesUsed;
+    if (e.key === 'm') {
+      if(player2Record[player2Index]) {
+      // console.log(e.key);
+        if(p2TriggerPulled === true) {
+          p2FireShot();
+        }
+      //*1 showBullets();
+      }
+    }
+    p2TriggerPulled = false;
+  }
 
   //////////////////////////////////////////////////
   //////////////////////score/////////////////////////
@@ -196,7 +220,8 @@ window.onload = () => {
     distanceTravelled,
     enemiesKilled,
     powerUp,
-    lifePoints
+    lifePoints,
+    invincible
   ) {
     //*************playerStats***********//
     this.class = playerClass;
@@ -206,6 +231,7 @@ window.onload = () => {
     this.enemiesKilled = enemiesKilled;
     this.powerUp = powerUp;
     this.lifePoints = lifePoints;
+    this.invincible = invincible;
   }
 
   function startPlayer1Life() {
@@ -215,11 +241,12 @@ window.onload = () => {
       const playerTravelled = 0;
       const enemiesKilled = 0;
       const lifePoints = 1;
+      const invincible = true;
       const powerUp = 'none';
-      const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
+      const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible);
       //started a record of playerStats
       player1Record.push(life);
-      // console.log(player1Record);
+      console.log(life.invincible);
       const index = player1Record.length-1;
       player1Record[index].createPlayer1();
     }
@@ -232,8 +259,9 @@ window.onload = () => {
       const playerTravelled = 0;
       const enemiesKilled = 0;
       const lifePoints = 1;
+      const invincible = true;
       const powerUp = 'none';
-      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
+      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible);
       //started a record of playerStats
       player2Record.push(life);
       // console.log(player2Record);
@@ -249,9 +277,13 @@ window.onload = () => {
     game.appendChild(playerElement);
     player1 = document.getElementsByClassName('player1')[0];
     this.player1HitBox(playerElement);
-
+    const _this = this;
+    setTimeout(function() {
+      _this.invincible = false;
+      console.log(_this.invincible);
+    },2000);
   };
-
+// FINISH THIS FOR P2 and PUT IN IF STATEMENT FOR ENEMY COLLISION, IF INVINCIBLE IS FALSE
   Player.prototype.createPlayer2 = function() {
     const playerElement = document.createElement('div');
     playerElement.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
@@ -259,7 +291,10 @@ window.onload = () => {
     game.appendChild(playerElement);
     player2 = document.getElementsByClassName('player2')[0];
     this.player2HitBox(playerElement);
-
+    const _this = this;
+    setTimeout(function() {
+      _this.invincible = false;
+    },2000);
   };
 
   Player.prototype.player1HitBox = function(playerElement) {
@@ -267,7 +302,10 @@ window.onload = () => {
     const hit = setInterval(function() {
       if (_this.lifePoints<1) {
         // console.log('I am true');
-        playerElement.parentNode.removeChild(playerElement);
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(playerElement) {
+          playerElement.parentNode.removeChild(playerElement);
+        }
         clearInterval(hit);
         startPlayer1Life();
       }
@@ -279,7 +317,10 @@ window.onload = () => {
     const hit = setInterval(function() {
       if (_this.lifePoints<1) {
         // console.log('I am true');
-        playerElement.parentNode.removeChild(playerElement);
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(playerElement) {
+          playerElement.parentNode.removeChild(playerElement);
+        }
         clearInterval(hit);
         startPlayer2Life();
       }
@@ -293,22 +334,25 @@ window.onload = () => {
 
 
   ///////////////////Bullet mechanics//////////////////////////////////////////
-  function Bullet(xPos,yPos,id,hitPoints) {
+  function Bullet(xPos,yPos,id,hitPoints, bulletClass) {
     this.xPos = xPos;
     this.yPos = yPos;
     this.id = id;
     this.hitPoints = hitPoints;
+    this.class = bulletClass;
   }
 
   function p1ChargeShot() {
+    console.log(p1TriggerPulled)
     p1ShotPower = p1DefaultShotPower;
     const charge = setInterval(function() {
-      if(p1ShotPower<=3) {
+      if(p1ShotPower<=3 && p1TriggerPulled === true) {
         p1ShotPower +=0.1;
         // console.log(p1ShotPower)
-      } else if(p1TriggerPulled === true) {
+      } else {
         clearInterval(charge);
       }
+      console.log(p1TriggerPulled);
     },100);
   }
 
@@ -323,6 +367,7 @@ window.onload = () => {
       p1ShootMax();
     }
     p1ShotPower = p1DefaultShotPower;
+    console.log(p1ShotPower);
   }
 
   function p1ShootLvl1() {
@@ -331,7 +376,8 @@ window.onload = () => {
     const bulletX = player1Record[player1Index].xPos;
     const bulletY = player1Record[player1Index].yPos+15;
     const hitPoints = 1;
-    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    const bulletClass = 'bulletLvl1';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
     p1BulletsInPlay.push(fire);
     const index = p1BulletsInPlay.length-1;
     p1BulletsInPlay[index].p1CreateBullet();
@@ -342,7 +388,8 @@ window.onload = () => {
     const bulletX = player1Record[player1Index].xPos;
     const bulletY = player1Record[player1Index].yPos+15;
     const hitPoints = 2;
-    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    const bulletClass = 'bulletLvl2';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
     p1BulletsInPlay.push(fire);
     const index = p1BulletsInPlay.length-1;
     p1BulletsInPlay[index].p1CreateBullet();
@@ -353,7 +400,8 @@ window.onload = () => {
     const bulletX = player1Record[player1Index].xPos;
     const bulletY = player1Record[player1Index].yPos+15;
     const hitPoints = 3;
-    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    const bulletClass = 'bulletLvl3';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
     p1BulletsInPlay.push(fire);
     const index = p1BulletsInPlay.length-1;
     p1BulletsInPlay[index].p1CreateBullet();
@@ -364,19 +412,83 @@ window.onload = () => {
     const bulletX = player1Record[player1Index].xPos;
     const bulletY = player1Record[player1Index].yPos+15;
     const hitPoints = 10;
-    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    const bulletClass = 'bulletLvlMax';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
     p1BulletsInPlay.push(fire);
     const index = p1BulletsInPlay.length-1;
     p1BulletsInPlay[index].p1CreateBullet();
   }
 
-  function p2ShootNormal() {
+  function p2ChargeShot() {
+    p2ShotPower = p2DefaultShotPower;
+    const charge = setInterval(function() {
+      if(p2ShotPower<=3 && p2TriggerPulled === true) {
+        p2ShotPower +=0.1;
+        // console.log(p1ShotPower)
+      } else {
+        clearInterval(charge);
+      }
+      console.log(p2TriggerPulled);
+    },100);
+  }
+
+  function p2FireShot() {
+    if (p2ShotPower<1) {
+      p2ShootLvl1();
+    } else if(p2ShotPower<2) {
+      p2ShootLvl2();
+    }else if (p2ShotPower<3) {
+      p2ShootLvl3();
+    } else if(p2ShotPower>=3){
+      p2ShootMax();
+    }
+    p2ShotPower = p2DefaultShotPower;
+  }
+
+  function p2ShootLvl1() {
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
     const bulletX = player2Record[player2Index].xPos;
     const bulletY = player2Record[player2Index].yPos+15;
     const hitPoints = 1;
-    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    const bulletClass = 'bulletLvlLvl1';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
+    p2BulletsInPlay.push(fire);
+    const index = p2BulletsInPlay.length-1;
+    p2BulletsInPlay[index].p2CreateBullet();
+  }
+  function p2ShootLvl2() {
+    //index focuses on the last player created
+    const player2Index = p2LivesUsed;
+    const bulletX = player2Record[player2Index].xPos;
+    const bulletY = player2Record[player2Index].yPos+15;
+    const hitPoints = 2;
+    const bulletClass = 'bulletLvl2';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
+    p2BulletsInPlay.push(fire);
+    const index = p2BulletsInPlay.length-1;
+    p2BulletsInPlay[index].p2CreateBullet();
+  }
+  function p2ShootLvl3() {
+    //index focuses on the last player created
+    const player2Index = p2LivesUsed;
+    const bulletX = player2Record[player2Index].xPos;
+    const bulletY = player2Record[player2Index].yPos+15;
+    const hitPoints = 3;
+    const bulletClass = 'bulletLvl3';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
+    p2BulletsInPlay.push(fire);
+    const index = p2BulletsInPlay.length-1;
+    p2BulletsInPlay[index].p2CreateBullet();
+  }
+  function p2ShootMax() {
+    //index focuses on the last player created
+    const player2Index = p2LivesUsed;
+    const bulletX = player2Record[player2Index].xPos;
+    const bulletY = player2Record[player2Index].yPos+15;
+    const hitPoints = 10;
+    const bulletClass = 'bulletLvlMax';
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints, bulletClass);
     p2BulletsInPlay.push(fire);
     const index = p2BulletsInPlay.length-1;
     p2BulletsInPlay[index].p2CreateBullet();
@@ -386,7 +498,7 @@ window.onload = () => {
     bulletId +=1;
     const bullet = document.createElement('div');
     bullet.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    bullet.setAttribute('class', 'bullet');
+    bullet.setAttribute('class', this.class);
     game.appendChild(bullet);
     this.p1Travel(bullet);
     this.p1TargetCheck(bullet);
@@ -411,7 +523,7 @@ window.onload = () => {
     // console.log(bulletsInPlay.indexOf(_this))
     const travelTime = setInterval(function () {
       if(_this.xPos < 1000) {
-        _this.xPos+=50;
+        _this.xPos+=6.125;
         currentBullet.style.left = _this.xPos +'px';
       } else {
         // console.log(currentBullet.parentNode);
@@ -419,12 +531,15 @@ window.onload = () => {
         p1BulletsInPlay.forEach(object => {
           if (object.id === _this.id) {
             p1BulletsInPlay.splice(p1BulletsInPlay.indexOf(_this),1);
-            currentBullet.parentNode.removeChild(currentBullet);
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(currentBullet) {
+              currentBullet.parentNode.removeChild(currentBullet);
+            }
           }
         });
         clearInterval(travelTime);
       }
-    },50);
+    },5); //speed of bullet
   };
 
   Bullet.prototype.p2Travel = function(currentBullet) {
@@ -432,7 +547,7 @@ window.onload = () => {
     // console.log(bulletsInPlay.indexOf(_this))
     const travelTime = setInterval(function () {
       if(_this.xPos < 1000) {
-        _this.xPos+=50;
+        _this.xPos+=6.125;
         currentBullet.style.left = _this.xPos +'px';
       } else {
         // console.log(currentBullet.parentNode);
@@ -440,21 +555,27 @@ window.onload = () => {
         p2BulletsInPlay.forEach(object => {
           if (object.id === _this.id) {
             p2BulletsInPlay.splice(p2BulletsInPlay.indexOf(_this),1);
-            currentBullet.parentNode.removeChild(currentBullet);
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(currentBullet) {
+              currentBullet.parentNode.removeChild(currentBullet);
+            }
           }
         });
         clearInterval(travelTime);
       }
-    },50);
+    },10); //speed of bullet
   };
 
   Bullet.prototype.p1TargetCheck = function(currentBullet) {
     const _this = this;
     const hit = setInterval(function() {
-      if (_this.hitPoints<1) {
+      if (_this.hitPoints<=0) {
         // console.log('I am true');
         p1BulletsInPlay.splice(p1BulletsInPlay.indexOf(_this),1);
-        currentBullet.parentNode.removeChild(currentBullet);
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(currentBullet) {
+          currentBullet.parentNode.removeChild(currentBullet);
+        }
         // console.log(bulletsInPlay.length);
         // console.log(currentBullet.parentNode);
         clearInterval(hit);
@@ -468,7 +589,10 @@ window.onload = () => {
       if (_this.hitPoints<1) {
         // console.log('I am true');
         p2BulletsInPlay.splice(p2BulletsInPlay.indexOf(_this),1);
-        currentBullet.parentNode.removeChild(currentBullet);
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(currentBullet) {
+          currentBullet.parentNode.removeChild(currentBullet);
+        }
         // console.log(bulletsInPlay.length);
         // console.log(currentBullet.parentNode);
         clearInterval(hit);
@@ -503,10 +627,12 @@ window.onload = () => {
     // numberOfEnemies, delay
     wave1(8,2000);
     wave2(10,10000);
+    wave3(8,15000);
     wave2(14,20000);
     wave1(8,25000);
     wave2(14,32000);
     wave1(8,40000);
+
 
   // wave3();
   }
@@ -549,6 +675,32 @@ window.onload = () => {
           enemiesInPlay.push(spawnedEnemy);
           const index = enemiesInPlay.length-1;
           enemiesInPlay[index].createWave2Enemy();
+          console.log(enemiesInPlay[index]);
+        } else {
+          clearInterval(releaseEnemy);
+        }
+      },
+      500 //********** rate at which wave 2 enemies spawn *************//
+      );
+    },
+    delay //************** delay for when wave 2 initiates *****************//
+    );
+  }
+
+  function wave3(numberOfEnemies,delay) {
+    setTimeout(function() {
+      const enemyX = 1000;
+      const enemyY = 300;
+      const lifePoints = 1;
+      const score = 10;
+      let i = numberOfEnemies;
+      const releaseEnemy = setInterval(function() {
+        if(i > 0) {
+          i-=1;
+          const spawnedEnemy = new Enemy('wave3', enemyX, enemyY, enemyId, lifePoints, score);
+          enemiesInPlay.push(spawnedEnemy);
+          const index = enemiesInPlay.length-1;
+          enemiesInPlay[index].createWave3Enemy();
         } else {
           clearInterval(releaseEnemy);
         }
@@ -582,6 +734,16 @@ window.onload = () => {
     this.collisionDetect(drone);
   };
 
+  Enemy.prototype.createWave3Enemy = function() {
+    enemyId +=1;
+    const drone = document.createElement('div');
+    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    drone.setAttribute('class', this.class);
+    game.appendChild(drone);
+    // console.log(this);
+    this.wave3Travel(drone);
+    this.collisionDetect(drone);
+  };
 
 
   //Below needs to be applied to the created enemy belonging to that object,
@@ -591,14 +753,14 @@ window.onload = () => {
     const _this = this;
     const movement = setInterval(function() {
       //starting xPos is 1000
-      if(_this.xPos > 400) {
-        _this.xPos -= 12.5;
-        _this.yPos += 12.5;
+      if(_this.xPos > 412.5) {
+        _this.xPos -= 6.125;
+        _this.yPos += 6.125;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if (_this.xPos > -37.5) {
-        _this.xPos -= 12.5;
-        _this.yPos -= 12.5;
+        _this.xPos -= 6.125;
+        _this.yPos -= 6.125;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 0) {
@@ -608,12 +770,15 @@ window.onload = () => {
             // console.log(_this.id);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            drone.parentNode.removeChild(drone);
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(drone) {
+              drone.parentNode.removeChild(drone);
+            }
             clearInterval(movement);
           }
         });
       }
-    },100); //rate at which enemies move
+    },50); //rate at which enemies move
   };
 
   Enemy.prototype.wave2Travel = function(drone) {
@@ -621,14 +786,14 @@ window.onload = () => {
     const _this = this;
     const movement = setInterval(function() {
       //starting xPos is 1000
-      if(_this.xPos > 400) {
-        _this.xPos -= 12.5;
-        _this.yPos -= 12.5;
+      if(_this.xPos > 412.5) {
+        _this.xPos -= 6.125;
+        _this.yPos -= 6.125;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if (_this.xPos > -37.5) {
-        _this.xPos -= 12.5;
-        _this.yPos += 12.5;
+        _this.xPos -= 6.125;
+        _this.yPos += 6.125;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
       } else if(game.children.length > 0) {
@@ -638,13 +803,41 @@ window.onload = () => {
             // console.log(_this.id);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            drone.parentNode.removeChild(drone);
-
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(drone) {
+              drone.parentNode.removeChild(drone);
+            }
             clearInterval(movement);
           }
         });
       }
-    },100); //rate at which enemies
+    },50); //rate at which enemies
+  };
+
+  Enemy.prototype.wave3Travel = function(drone) {
+    // console.log(enemiesInPlay.length);
+    const _this = this;
+    const movement = setInterval(function() {
+      //starting xPos is 1000
+      if (_this.xPos > -37.5) {
+        _this.xPos -= 6.125;
+        drone.style.left = _this.xPos + 'px';
+      } else if(game.children.length > 0) {
+        enemiesInPlay.forEach(object => {
+          if (object.id === _this.id) {
+            // console.log(object.id);
+            // console.log(_this.id);
+            // console.log(enemiesInPlay.length);
+            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(drone) {
+              drone.parentNode.removeChild(drone);
+            }
+            clearInterval(movement);
+          }
+        });
+      }
+    },50); //rate at which enemies
   };
 
   Enemy.prototype.collisionDetect = function(drone) {
@@ -667,15 +860,19 @@ window.onload = () => {
 
       //bullet collision//
       p1BulletsInPlay.forEach(object => {
+        //width of bullet is hardcoded, needs to be dynamic, as different level shots may have different widths.
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
-          && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
+          && object.yPos <= yMax && object.yPos + 10 >= yMin) {
           const temp = _this.lifePoints;
           _this.lifePoints-=object.hitPoints;
           object.hitPoints-=temp;
           // console.log(object.hitTarget);
           if(_this.lifePoints <= 0) {
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            drone.parentNode.removeChild(drone);
+            //a check for if the element has been deleted for any reason before this function could do it.
+            if(drone) {
+              drone.parentNode.removeChild(drone);
+            }
             // console.log(enemiesInPlay.length);
             p1ScoreCount+=_this.score;
             ///////////////////////////////////////////////
@@ -686,15 +883,19 @@ window.onload = () => {
       });
 
       p2BulletsInPlay.forEach(object => {
+        //width of bullet is hardcoded, needs to be dynamic, as different level shots may have different widths.
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
           const temp = _this.lifePoints;
           _this.lifePoints-=object.hitPoints;
-          object.hitPoints-= temp;
+          object.hitPoints-=temp;
           // console.log(object.hitTarget);
           if(_this.lifePoints <= 0) {
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            drone.parentNode.removeChild(drone);
+            //a check for if the element has been deleted for any reason before this function could do it. Still doesn't work..
+            if(drone) {
+              drone.parentNode.removeChild(drone);
+            }
             // console.log(enemiesInPlay.length);
             p2ScoreCount+=_this.score;
             ///////////////////////////////////////////////
@@ -708,7 +909,7 @@ window.onload = () => {
       //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
       if(player1Record[player1Index]) {
         if(player1Record[player1Index].xPos <= xMax && player1Record[player1Index].xPos + 50 >= xMin
-          && player1Record[player1Index].yPos <= yMax && player1Record[player1Index].yPos + 10 >= yMin){
+          && player1Record[player1Index].yPos <= yMax && player1Record[player1Index].yPos + 10 >= yMin && player1Record[player1Index].invincible === false){
           player1Record[player1Index].lifePoints -= 1;
           //set position to null on death as enemys may continue to fly through and lower the score.
           player1Record[player1Index].xPos = null;
@@ -728,7 +929,7 @@ window.onload = () => {
       //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
       if(player2Record[player2Index]) {
         if(player2Record[player2Index].xPos <= xMax && player2Record[player2Index].xPos + 50 >= xMin
-          && player2Record[player2Index].yPos <= yMax && player2Record[player2Index].yPos + 10 >= yMin){
+          && player2Record[player2Index].yPos <= yMax && player2Record[player2Index].yPos + 10 >= yMin && player2Record[player2Index].invincible === false){
           player2Record[player2Index].lifePoints -= 1;
           //set position to null on death as enemys may continue to fly through and lower the score.
           player2Record[player2Index].xPos = null;
@@ -745,7 +946,7 @@ window.onload = () => {
         }
       }
     },
-    100 // increase for more accurate detection but be mindful of performance. Set at less than bullet/enemy movement.
+    10 // increase for more accurate detection but be mindful of performance. Set at less than bullet/enemy movement.
     );
   };
 
