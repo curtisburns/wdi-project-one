@@ -10,7 +10,7 @@ window.onload = () => {
 
 //   ////////////////Declarations///////////////////////
   const game = document.getElementsByClassName('game')[0];
-  let player2Mode = false; //will be included in intro so player can select.
+  let player2Mode = true; //will be included in intro so player can select.
   const p1Score = document.getElementsByClassName('p1-score')[0];
   const p2Score = document.getElementsByClassName('p2-score')[0];
   let p1ScoreCount;
@@ -26,15 +26,21 @@ window.onload = () => {
   let enemyId = 0;
   let player1Lives = 3;
   let player2Lives = 3;
+  let p1DefaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
+  let p1ShotPower = 0
+  let p1TriggerPulled = false; //This can be used to effect powerUps e.g 3 for a period of time;
+  let p2DefaultShotPower = 0;
+  let p2TriggerPulled = false;
+  let p2ShotPower = 0
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
   let player2;
   //   //////////////////////////////////////////////////////
   //   //////////////////////////player 1 Movement//////////////////////
 
-  window.addEventListener('keydown', p1CheckKeys);
+  window.addEventListener('keydown', p1CheckKeyDown);
 
-  function p1CheckKeys(e) {
+  function p1CheckKeyDown(e) {
     const player1Index = p1LivesUsed;
     // right
     if (e.key === 'ArrowRight') {
@@ -81,20 +87,38 @@ window.onload = () => {
     /////////////////////////////////////////////////////////
 
     //************Shoot*******************///
+
     if (e.key === 'm') {
       if(player1Record[player1Index]) {
       // console.log(e.key);
-        p1ShootNormal();
+        if(p1TriggerPulled === false) {
+          p1ChargeShot();
+        }
+        p1TriggerPulled = true;
       //*1 showBullets();
       }
     }
   }
+  window.addEventListener('keyup', p1CheckKeyUp);
 
+  function p1CheckKeyUp(e) {
+    const player1Index = p1LivesUsed;
+    if (e.key === 'm') {
+      if(player1Record[player1Index]) {
+      // console.log(e.key);
+        if(p1TriggerPulled === true) {
+          p1FireShot();
+        }
+        p1TriggerPulled = false;
+      //*1 showBullets();
+      }
+    }
+  }
   //   //////////////////////////player 2 Movement//////////////////////
-  window.addEventListener('keydown', p2CheckKeys);
+  window.addEventListener('keydown', p2CheckKeyDown);
 
-  function p2CheckKeys(e) {
-    console.log(e.key);
+  function p2CheckKeyDown(e) {
+    // console.log(e.key);
     const player2Index = p2LivesUsed;
     // right
     if (e.key === 'd') {
@@ -195,7 +219,7 @@ window.onload = () => {
       const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
       //started a record of playerStats
       player1Record.push(life);
-      console.log(player1Record);
+      // console.log(player1Record);
       const index = player1Record.length-1;
       player1Record[index].createPlayer1();
     }
@@ -212,7 +236,7 @@ window.onload = () => {
       const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints);
       //started a record of playerStats
       player2Record.push(life);
-      console.log(player2Record);
+      // console.log(player2Record);
       const index = player2Record.length-1;
       player2Record[index].createPlayer2();
     }
@@ -276,12 +300,70 @@ window.onload = () => {
     this.hitPoints = hitPoints;
   }
 
-  function p1ShootNormal() {
+  function p1ChargeShot() {
+    p1ShotPower = p1DefaultShotPower;
+    const charge = setInterval(function() {
+      if(p1ShotPower<=3) {
+        p1ShotPower +=0.1;
+        // console.log(p1ShotPower)
+      } else if(p1TriggerPulled === true) {
+        clearInterval(charge);
+      }
+    },100);
+  }
+
+  function p1FireShot() {
+    if (p1ShotPower<1) {
+      p1ShootLvl1();
+    } else if(p1ShotPower<2) {
+      p1ShootLvl2();
+    }else if (p1ShotPower<3) {
+      p1ShootLvl3();
+    } else if(p1ShotPower>=3){
+      p1ShootMax();
+    }
+    p1ShotPower = p1DefaultShotPower;
+  }
+
+  function p1ShootLvl1() {
     //index focuses on the last player created
     const player1Index = p1LivesUsed;
     const bulletX = player1Record[player1Index].xPos;
     const bulletY = player1Record[player1Index].yPos+15;
     const hitPoints = 1;
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    p1BulletsInPlay.push(fire);
+    const index = p1BulletsInPlay.length-1;
+    p1BulletsInPlay[index].p1CreateBullet();
+  }
+  function p1ShootLvl2() {
+    //index focuses on the last player created
+    const player1Index = p1LivesUsed;
+    const bulletX = player1Record[player1Index].xPos;
+    const bulletY = player1Record[player1Index].yPos+15;
+    const hitPoints = 2;
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    p1BulletsInPlay.push(fire);
+    const index = p1BulletsInPlay.length-1;
+    p1BulletsInPlay[index].p1CreateBullet();
+  }
+  function p1ShootLvl3() {
+    //index focuses on the last player created
+    const player1Index = p1LivesUsed;
+    const bulletX = player1Record[player1Index].xPos;
+    const bulletY = player1Record[player1Index].yPos+15;
+    const hitPoints = 3;
+    const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
+    p1BulletsInPlay.push(fire);
+    const index = p1BulletsInPlay.length-1;
+    p1BulletsInPlay[index].p1CreateBullet();
+  }
+  function p1ShootMax() {
+    //index focuses on the last player created
+    const player1Index = p1LivesUsed;
+    const bulletX = player1Record[player1Index].xPos;
+    const bulletY = player1Record[player1Index].yPos+15;
+    const hitPoints = 10;
     const fire = new Bullet(bulletX,bulletY,bulletId, hitPoints);
     p1BulletsInPlay.push(fire);
     const index = p1BulletsInPlay.length-1;
@@ -440,7 +522,7 @@ window.onload = () => {
         if(i > 0) {
           i-=1;
           const spawnedEnemy = new Enemy('wave1', enemyX, enemyY, enemyId, lifePoints , score);
-          console.log(spawnedEnemy);
+          // console.log(spawnedEnemy);
           enemiesInPlay.push(spawnedEnemy);
           const index = enemiesInPlay.length-1;
           enemiesInPlay[index].createWave1Enemy();
@@ -587,10 +669,11 @@ window.onload = () => {
       p1BulletsInPlay.forEach(object => {
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
+          const temp = _this.lifePoints;
           _this.lifePoints-=object.hitPoints;
-          object.hitPoints-=1;
+          object.hitPoints-=temp;
           // console.log(object.hitTarget);
-          if(_this.lifePoints === 0) {
+          if(_this.lifePoints <= 0) {
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             drone.parentNode.removeChild(drone);
             // console.log(enemiesInPlay.length);
@@ -605,10 +688,11 @@ window.onload = () => {
       p2BulletsInPlay.forEach(object => {
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin ) {
+          const temp = _this.lifePoints;
           _this.lifePoints-=object.hitPoints;
-          object.hitPoints-=1;
+          object.hitPoints-= temp;
           // console.log(object.hitTarget);
-          if(_this.lifePoints === 0) {
+          if(_this.lifePoints <= 0) {
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             drone.parentNode.removeChild(drone);
             // console.log(enemiesInPlay.length);
