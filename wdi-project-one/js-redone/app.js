@@ -7,8 +7,9 @@ window.onload = () => {
 //is because the detection rate is too slow and two bullets can enter the position of the drone
 //and therefore fucntion tries to remove the same drone twice. increase detection rate?
 
-//NEED TO FIX BULLET CHARGE INTERVAL, Charge doesnt work as keydown is cancelled on press of other buttons.
-//Need to push to an array. Need to separate functions from input, then activate those functions via the array.
+//need to fix charge.
+
+//p1 and p2 bullets can be refactored in same way as movement.
 //////////////////////////////
 
 //   ////////////////Declarations///////////////////////
@@ -32,9 +33,7 @@ window.onload = () => {
   let player2Lives = 3;
   let p1DefaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
   let p1ShotPower = 0;
-  let p1TriggerPulled = false; //This can be used to effect powerUps e.g 3 for a period of time;
   let p2DefaultShotPower = 0;
-  let p2TriggerPulled = false;
   let p2ShotPower = 0;
   let movementIncrement = 5;
   //These is declared as let as they are rassigned when they have been removed from DOM
@@ -47,86 +46,153 @@ window.onload = () => {
   const logDiv = document.getElementById('log');
   setInterval(() => logDiv.textContent = `${movementIntervals[0]['left']}, ${movementIntervals[0]['right']} ${movementIntervals[0]['down']}, ${movementIntervals[0]['up']}`, 100);
 
+  let ArrowLeft = false;
+  let ArrowRight = false;
+  let ArrowUp = false;
+  let ArrowDown = false;
+  let p1TriggerPulled = false;
+  let w = false;
+  let a = false;
+  let s = false;
+  let d = false;
+  let p2TriggerPulled = false;
+
   window.addEventListener('keydown', e => {
     e.preventDefault();
+
+    console.log(e.key);
     switch(e.key) {
       case 'ArrowLeft':
-        startMovement(0, 'left');
+        if (ArrowLeft === false) {
+          startMovement(0, 'left');
+        }
+        ArrowLeft = true;
         break;
       case 'ArrowRight':
-        startMovement(0, 'right');
+        if (ArrowRight === false) {
+          startMovement(0, 'right');
+        }
+        ArrowRight = true;
         break;
       case 'ArrowUp':
-        startMovement(0, 'up');
+        if (ArrowUp === false) {
+          startMovement(0, 'up');
+        }
+        ArrowUp = true;
         break;
       case 'ArrowDown':
-        startMovement(0, 'down');
+        if (ArrowDown === false) {
+          startMovement(0, 'down');
+        }
+        ArrowDown = true;
+        break;
+      case 'm':
+        if (p1TriggerPulled === false) {
+          p1ChargeShot();
+        }
+        p1TriggerPulled = true;
         break;
       case 'w':
-        startMovement(1, 'up');
+        if (w === false) {
+          startMovement(1, 'up');
+        }
+        w = true;
         break;
       case 'a':
-        startMovement(1, 'left');
+        if (a === false) {
+          startMovement(1, 'left');
+        }
+        a = true;
         break;
       case 's':
-        startMovement(1, 'down');
+        if (s === false) {
+          startMovement(1, 'down');
+        }
+        s = true;
         break;
       case 'd':
-        startMovement(1, 'right');
+        if (d === false) {
+          startMovement(1, 'right');
+        }
+        d = true;
+        break;
+      case 'c':
+        if (p2TriggerPulled === false) {
+          p2ChargeShot();
+        }
+        p2TriggerPulled = true;
         break;
     }
   });
+
 
   window.addEventListener('keyup', e => {
     switch(e.key) {
       case 'ArrowLeft':
         stopMovement(0, 'left');
+        ArrowLeft = false;
         break;
       case 'ArrowRight':
         stopMovement(0, 'right');
+        ArrowRight = false;
         break;
       case 'ArrowUp':
         stopMovement(0, 'up');
+        ArrowUp = false;
         break;
       case 'ArrowDown':
         stopMovement(0, 'down');
+        ArrowDown = false;
+        break;
+      case 'm':
+        p1FireShot(0);
+        p1TriggerPulled = false;
         break;
       case 'w':
         stopMovement(1, 'up');
+        w = false;
         break;
       case 'a':
         stopMovement(1, 'left');
+        a = false;
         break;
       case 's':
         stopMovement(1, 'down');
+        s = false;
         break;
       case 'd':
         stopMovement(1, 'right');
+        d = false;
+        break;
+      case 'c':
+        p2FireShot(1);
+        p2TriggerPulled = false;
         break;
     }
   });
 
-  function startMovement(i, direction) {
-    const interval = movementIntervals[i][direction];
+  function startMovement(playerNumber, direction) {
+    const interval = movementIntervals[playerNumber][direction];
     if (!interval) {
-      movementIntervals[i][direction] = setInterval(() => movePlayer(i, direction), 10);
+      movementIntervals[playerNumber][direction] = setInterval(() => movePlayer(playerNumber, direction), 10);
     }
   }
 
-  function stopMovement(i, direction) {
-    const interval = movementIntervals[i][direction];
+  function stopMovement(playerNumber, direction) {
+    const interval = movementIntervals[playerNumber][direction];
     if (interval) {
       clearInterval(interval);
-      movementIntervals[i][direction] =  null;
+      movementIntervals[playerNumber][direction] =  null;
     }
   }
 
   // window.addEventListener('keydown', p1CheckKeyDown);
   function movePlayer(playerNumber, direction) {
-    const playerRecord = playerNumber === 1 ? player1Record : player2Record;
-    const playerIndex = playerNumber === 1 ? p1LivesUsed : p2LivesUsed;
-    const player = playerNumber === 1 ? player1 : player2;
+    const playerRecord = playerNumber === 0 ? player1Record : player2Record;
+    const playerIndex = playerNumber === 0 ? p1LivesUsed : p2LivesUsed;
+    const player = playerNumber === 0 ? player1 : player2;
     const currentRecord = playerRecord[playerIndex];
+    //check for if player exists(could be between lives)
     if(currentRecord) {
       switch(direction) {
         case 'right':
@@ -146,28 +212,28 @@ window.onload = () => {
   }
 
   function movePlayerRight(currentRecord, player) {
-    if(currentRecord.xPos < 950) {
+    if(currentRecord.xPos < 1000-currentRecord.width) {
       currentRecord.xPos+=movementIncrement;
       player.style.left = currentRecord.xPos + 'px';
     }
   }
 
   function movePlayerLeft(currentRecord, player) {
-    if(currentRecord.xPos > movementIncrement) {
+    if(currentRecord.xPos > 0) {
       currentRecord.xPos-=movementIncrement;
       player.style.left = currentRecord.xPos + 'px';
     }
   }
 
   function movePlayerUp(currentRecord, player) {
-    if(currentRecord.yPos > movementIncrement) {
+    if(currentRecord.yPos > 0) {
       currentRecord.yPos-=movementIncrement;
       player.style.top = currentRecord.yPos + 'px';
     }
   }
 
   function movePlayerDown(currentRecord, player) {
-    if(currentRecord.yPos < 550) {
+    if(currentRecord.yPos < 600-currentRecord.height) {
       currentRecord.yPos+=movementIncrement;
       player.style.top = currentRecord.yPos + 'px';
     }
@@ -353,7 +419,9 @@ window.onload = () => {
     enemiesKilled,
     powerUp,
     lifePoints,
-    invincible
+    invincible,
+    width,
+    height
   ) {
     //*************playerStats***********//
     this.class = playerClass;
@@ -364,6 +432,8 @@ window.onload = () => {
     this.powerUp = powerUp;
     this.lifePoints = lifePoints;
     this.invincible = invincible;
+    this.width = width;
+    this.height = height;
   }
 
   function startPlayer1Life() {
@@ -375,7 +445,9 @@ window.onload = () => {
       const lifePoints = 1;
       const invincible = true;
       const powerUp = 'none';
-      const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible);
+      const width = 50;
+      const height = 50;
+      const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
       //started a record of playerStats
       player1Record.push(life);
       // console.log(life.invincible);
@@ -393,7 +465,9 @@ window.onload = () => {
       const lifePoints = 1;
       const invincible = true;
       const powerUp = 'none';
-      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible);
+      const width = 50;
+      const height = 50;
+      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
       //started a record of playerStats
       player2Record.push(life);
       // console.log(player2Record);
@@ -404,7 +478,7 @@ window.onload = () => {
 
   Player.prototype.createPlayer1 = function() {
     const playerElement = document.createElement('div');
-    playerElement.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
     game.appendChild(playerElement);
     player1 = document.getElementsByClassName('player1')[0];
@@ -418,7 +492,7 @@ window.onload = () => {
 // FINISH THIS FOR P2 and PUT IN IF STATEMENT FOR ENEMY COLLISION, IF INVINCIBLE IS FALSE
   Player.prototype.createPlayer2 = function() {
     const playerElement = document.createElement('div');
-    playerElement.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+    playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
     game.appendChild(playerElement);
     player2 = document.getElementsByClassName('player2')[0];
@@ -474,21 +548,23 @@ window.onload = () => {
     this.class = bulletClass;
   }
 
+  let p1Charge;
+
   function p1ChargeShot() {
-    // console.log(p1TriggerPulled)
-    p1ShotPower = p1DefaultShotPower;
-    const charge = setInterval(function() {
-      if(p1ShotPower<=3 && p1TriggerPulled === true) {
+    p1Charge = setInterval(() => {
+      if(p1ShotPower.toFixed(2)<=3) {
         p1ShotPower +=0.1;
-        // console.log(p1ShotPower)
-      } else {
-        clearInterval(charge);
+        console.log(p1ShotPower.toFixed(2));
+        // console.log('p1Charging');
+      } else if (p1ShotPower.toFixed>3) {
+        clearInterval(p1Charge);
       }
       // console.log(p1TriggerPulled);
     },50); //rate of charge
   }
 
   function p1FireShot() {
+    clearInterval(p1Charge)
     if (p1ShotPower<1) {
       p1ShootLvl1();
     } else if(p1ShotPower<2) {
@@ -499,6 +575,8 @@ window.onload = () => {
       p1ShootMax();
     }
     p1ShotPower = p1DefaultShotPower;
+    // console.log('p1ChargeClear');
+    console.log(p1ShotPower.toFixed(2));
     // console.log(p1ShotPower);
   }
 
@@ -552,7 +630,7 @@ window.onload = () => {
   }
 
   function p2ChargeShot() {
-        console.log('im charging')
+        // console.log('im charging')
     // console.log(p1TriggerPulled)
     p2ShotPower = p2DefaultShotPower;
     const charge = setInterval(function() {
@@ -567,7 +645,7 @@ window.onload = () => {
   }
 
   function p2FireShot() {
-        console.log('im firing')
+        // console.log('im firing')
     if (p2ShotPower<1) {
       p2ShootLvl1();
     } else if(p2ShotPower<2) {
@@ -582,7 +660,7 @@ window.onload = () => {
   }
 
   function p2ShootLvl1() {
-    console.log('Imfiring lvl1');
+    // console.log('Imfiring lvl1');
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
     const bulletX = player2Record[player2Index].xPos;
