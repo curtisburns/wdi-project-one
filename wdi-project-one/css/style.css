@@ -11,7 +11,7 @@
   height: 50px;
   width: 50px;
   background-color: black;
-  transition: top .05s linear, left .05s linear 0s;
+  /* transition: top .05s linear, left .05s linear 0s; */
 }
 
 .player2 {
