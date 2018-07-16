@@ -246,7 +246,7 @@ window.onload = () => {
       const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible);
       //started a record of playerStats
       player1Record.push(life);
-      console.log(life.invincible);
+      // console.log(life.invincible);
       const index = player1Record.length-1;
       player1Record[index].createPlayer1();
     }
@@ -343,7 +343,7 @@ window.onload = () => {
   }
 
   function p1ChargeShot() {
-    console.log(p1TriggerPulled)
+    // console.log(p1TriggerPulled)
     p1ShotPower = p1DefaultShotPower;
     const charge = setInterval(function() {
       if(p1ShotPower<=3 && p1TriggerPulled === true) {
@@ -352,8 +352,8 @@ window.onload = () => {
       } else {
         clearInterval(charge);
       }
-      console.log(p1TriggerPulled);
-    },100);
+      // console.log(p1TriggerPulled);
+    },50); //rate of charge
   }
 
   function p1FireShot() {
@@ -367,7 +367,7 @@ window.onload = () => {
       p1ShootMax();
     }
     p1ShotPower = p1DefaultShotPower;
-    console.log(p1ShotPower);
+    // console.log(p1ShotPower);
   }
 
   function p1ShootLvl1() {
@@ -429,7 +429,7 @@ window.onload = () => {
         clearInterval(charge);
       }
       console.log(p2TriggerPulled);
-    },100);
+    },50); //rate of charge
   }
 
   function p2FireShot() {
@@ -580,7 +580,7 @@ window.onload = () => {
         // console.log(currentBullet.parentNode);
         clearInterval(hit);
       }
-    },50);
+    },5);
   };
 
   Bullet.prototype.p2TargetCheck = function(currentBullet) {
@@ -597,7 +597,7 @@ window.onload = () => {
         // console.log(currentBullet.parentNode);
         clearInterval(hit);
       }
-    },50);
+    },5);
   };
 
 
@@ -625,13 +625,13 @@ window.onload = () => {
   function startWaves() {
     //level creation
     // numberOfEnemies, delay
-    wave1(8,2000);
-    wave2(10,10000);
-    wave3(8,15000);
-    wave2(14,20000);
-    wave1(8,25000);
-    wave2(14,32000);
-    wave1(8,40000);
+    // wave1(8,2000);
+    wave2(10,2000);
+    // wave3(8,15000);
+    // wave2(14,20000);
+    // wave1(8,25000);
+    // wave2(14,32000);
+    // wave1(8,40000);
 
 
   // wave3();
@@ -863,9 +863,11 @@ window.onload = () => {
         //width of bullet is hardcoded, needs to be dynamic, as different level shots may have different widths.
         if(object.xPos <= xMax && object.xPos + 50 >= xMin
           && object.yPos <= yMax && object.yPos + 10 >= yMin) {
+          console.log(_this.lifePoints);
           const temp = _this.lifePoints;
           _this.lifePoints-=object.hitPoints;
           object.hitPoints-=temp;
+          console.log(_this.lifePoints);
           // console.log(object.hitTarget);
           if(_this.lifePoints <= 0) {
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
@@ -946,7 +948,7 @@ window.onload = () => {
         }
       }
     },
-    10 // increase for more accurate detection but be mindful of performance. Set at less than bullet/enemy movement.
+    10 // increase for more accurate detection but be mindful of performance. Set at at a greater value than bullet/enemy movement and targetDetect(bullet removal function) - this is important.
     );
   };
 
