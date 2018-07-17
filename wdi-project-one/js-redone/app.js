@@ -36,11 +36,42 @@ const gameWidth = 1000; //can use this in calculations below - still need to ref
   body.appendChild(game);
 /////////////////////////////////////////
 
+//////////createIntro/////////
+
 const introScreen = document.createElement('div');
 introScreen.setAttribute('class','introScreen');
 introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
 game.appendChild(introScreen);
 
+const logo = document.createElement('img');
+logo.setAttribute('class','logo');
+logo.setAttribute('style', 'left: 290px; top: 100px;');
+logo.setAttribute('src', 'images/general-assembly-seeklogo.com.png');
+game.appendChild(logo);
+
+const letterG = document.createElement('img');
+letterG.setAttribute('class','letter-g');
+letterG.setAttribute('style', 'left: 362px; top: 156px;');
+letterG.setAttribute('src', 'images/general-assembly-letter-G.png');
+game.appendChild(letterG);
+
+const letterA = document.createElement('img');
+letterA.setAttribute('class','letter-a');
+letterA.setAttribute('style', 'left: 451px; top: 165px;');
+letterA.setAttribute('src', 'images/general-assembly-letter-A.png');
+game.appendChild(letterA);
+
+const alactic = document.createElement('div');
+alactic.setAttribute('class','alactic');
+alactic.setAttribute('style', 'left: 270px; top: 100px;');
+alactic.textContent = 'alactic';
+game.appendChild(alactic);
+
+const ssembly = document.createElement('div');
+ssembly.setAttribute('class','ssembly');
+ssembly.setAttribute('style', 'left: 350px; top: 330px;');
+ssembly.textContent = 'ssembly';
+game.appendChild(ssembly);
 
 
 //   ////////////////Declarations///////////////////////

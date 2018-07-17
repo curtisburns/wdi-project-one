@@ -1,3 +1,7 @@
+body {
+  background: lightgrey;
+}
+
 .game {
   background-color: grey;
   position: relative;
@@ -6,7 +10,79 @@
 }
 
 .introScreen {
-  background-color: #000;
+  position: relative;
+  background-color: black;
+
+}
+
+.logo {
+  position: absolute;
+  animation: animateLogo 1s 3s forwards
+}
+
+@keyframes animateLogo{
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* font-family: 'Press Start 2P', cursive;
+font-family: 'Poiret One', cursive;
+font-family: 'Monoton', cursive; */
+/* font-family: 'Orbitron', sans-serif */
+.letter-g {
+  position: absolute;
+  animation: animateG 1s 3.5s forwards;
+}
+
+.alactic {
+  color: white;
+  position: absolute;
+  font-size: 100px;
+  font-family: Orbitron;
+  animation: animateAlactic 1s 4s backwards ease-out;
+}
+
+.letter-a {
+  position: absolute;
+  animation: animateA 1s 3.5s forwards;
+}
+
+.ssembly {
+  color: white;
+  position: absolute;
+  font-size: 100px;
+  font-family: Orbitron;
+  animation: animateSsembly 1s 4.8s backwards ease-out;
+}
+
+@keyframes animateSsembly {
+  from {
+    left: 1000px;
+  }
+}
+
+@keyframes animateG {
+  100% {
+    top: 0px;
+    left: 150px;
+  }
+}
+
+@keyframes animateA {
+  100% {
+    top: 230px;
+    left: 220px;
+  }
+}
+
+@keyframes animateAlactic {
+  from {
+    left: 1000px;
+  }
 }
 
 .player1 {
