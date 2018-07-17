@@ -1,9 +1,12 @@
 .game {
   background-color: grey;
-  height: 600px;
-  width: 1000px;
   position: relative;
   margin: auto;
+  overflow: hidden;
+}
+
+.introScreen {
+  background-color: #000;
 }
 
 .player1 {
@@ -20,47 +23,53 @@
 
 
 .bulletLvl1 {
-  height: 10px;
-  width: 50px;
   background-color: white;
   position: absolute;
 }
 .bulletLvl2 {
-  height: 10px;
-  width: 50px;
   background-color: yellow;
   position: absolute;
 }
 .bulletLvl3 {
-  height: 10px;
-  width: 50px;
   background-color: red;
   position: absolute;
 }
 .bulletLvlMax {
-  height: 10px;
-  width: 50px;
   background-color: blue;
   position: absolute;
 }
 
-.wave1 {
+.type1 {
   position: absolute;
   height: 50px;
   width: 50px;
   background-color: red;
 }
 
-.wave2 {
+.type2 {
   position: absolute;
   height: 50px;
   width: 50px;
   background-color: brown;
 }
 
-.wave3 {
+.type3 {
   position: absolute;
   height: 50px;
   width: 50px;
   background-color: orange;
+}
+
+.type4 {
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  background-color: purple;
+}
+
+.type5 {
+  position: absolute;
+  height: 300px;
+  width: 300px;
+  background-color: green;
 }
