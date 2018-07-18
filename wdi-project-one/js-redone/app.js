@@ -335,6 +335,15 @@ function p1CycleRight() {
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
   let player2;
+
+  // TODO: Update types 3 4 and 5
+  const enemyTypes = {
+    type1: { x: 1000, y: -37.5, lifePoints: 1, score: 10 },
+    type2: { x: 1000, y: 575, lifePoints: 2, score: 25 },
+    type3: { x: 1000, y: 300, lifePoints: 1, score: 10 },
+    type4: { x: 1000, y: -37.5, lifePoints: 1, score: 10 },
+    type5: { x: 1000, y: -37.5, lifePoints: 1, score: 10 }
+  };
   //   //////////////////////////////////////////////////////
 
 
@@ -1026,13 +1035,184 @@ function p1CycleRight() {
 
 
   //////////////////////////////enemy creation//////////////////////////////////
-  function Enemy(enemyClass, xPos, yPos, id, lifePoints, score) {
-    this.class = enemyClass;
-    this.xPos = xPos;
-    this.yPos = yPos;
-    this.id = id;
-    this.lifePoints = lifePoints;
-    this.score = score;
+  function createEnemiesOfClass(enemyClass, numberOfEnemies, delay) {
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
+        let i = numberOfEnemies;
+        const releaseEnemy = setInterval(function() {
+          if (gameActive === false) {
+            clearInterval(releaseEnemy);
+          } else if(i > 0) {
+            i-=1;
+            const spawnedEnemy = new Enemy(enemyClass, enemyId);
+            enemiesInPlay.push(spawnedEnemy);
+          } else {
+            clearInterval(releaseEnemy);
+          }
+        },700 //********** rate at which type 1 enemies spawn *************//
+        );
+      }
+    },delay //************** delay for when type 2 initiates *****************//
+    ));
+  }
+
+  class Enemy {
+    constructor(enemyClass, id) {
+      const enemy = enemyTypes[enemyClass];
+      this.class = enemyClass;
+      this.xPos = enemy.x;
+      this.yPos = enemy.y;
+      this.id = id;
+      this.lifePoints = enemy.lifePoints;
+      this.score = enemy.score;
+      this.setUpdatePositionFunction();
+      console.log(`Created enemy ${enemyClass}`, this.positionFunction);
+      this.initialise();
+    }
+
+    setUpdatePositionFunction() {
+      switch(this.class) {
+        case 'type1':
+          this.positionFunction = this.updatePosition1;
+          break;
+        case 'type2':
+          this.positionFunction = this.updatePosition2;
+          break;
+        case 'type3':
+          this.positionFunction = this.updatePosition3;
+          break;
+        case 'type4':
+          this.positionFunction = this.updatePosition4;
+          break;
+        case 'type5':
+          this.positionFunction = this.updatePosition5;
+          break;
+      }
+    }
+
+    initialise() {
+      enemyId +=1;
+      this.drone = document.createElement('div');
+      this.drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+      this.drone.setAttribute('class', this.class);
+      playingField.appendChild(this.drone);
+      this.travel();
+      this.collisionDetect(this.drone);
+    }
+
+    collisionDetect() {
+
+    }
+
+    removeDOMElement() {
+      if(this.drone.parentNode) {
+        this.drone.parentNode.removeChild(this.drone);
+        this.drone = null;
+      }
+    }
+
+    travel() {
+      const _this = this;
+      const movement = setInterval(function() {
+        console.log(playingField.children.length);
+        const positionWasUpdated = _this.positionFunction();
+        if (!positionWasUpdated) {
+          if(playingField.children.length > 0) {
+            console.log('should remove');
+            // Remove from enemiesInPlay
+            enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
+            _this.removeDOMElement();
+            clearInterval(movement);
+          }
+        }
+      },50);
+      levelIntervals.push(movement); //rate at which enemies move
+    }
+
+    positionDOMElement() {
+      this.drone.style.left = this.xPos + 'px';
+      this.drone.style.top = this.yPos + 'px';
+    }
+
+    updatePosition1() {
+      //starting xPos is 1000
+      if(this.xPos > 412.5) {
+        this.xPos -= 5;
+        this.yPos += 5;
+        this.positionDOMElement()
+      } else if (this.xPos > -50) {
+        this.xPos -= 5;
+        this.yPos -= 5;
+        this.positionDOMElement()
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition2() {
+      //starting xPos is 1000
+      if(this.xPos > 412.5) {
+        this.xPos -= 5;
+        this.yPos -= 5;
+        this.positionDOMElement();
+      } else if (this.xPos > -50) {
+        this.xPos -= 5;
+        this.yPos += 5;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition3() {
+      //starting xPos is 1000
+      if (this.xPos > -50) {
+        this.xPos -= 5;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition4() {
+      //starting xPos is 1000
+      if (this.yPos < 300 - 50) {
+        this.yPos += 10;
+        this.xPos += 1;
+        this.positionDOMElement();
+      } else if (this.yPos < 600) {
+        this.yPos += 5;
+        this.xPos -= 1;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition5() {
+      //starting xPos is 1000
+      if (this.lifePoints > 100 && this.xPos >= 0) {
+        this.xPos -= 2;
+        this.positionDOMElement();
+      } else if (this.lifePoints > 50 && this.xPos <= 600 && this.xPos >= 0  ) {
+        this.xPos +=5;
+        this.positionDOMElement();
+      } else if (this.lifePoints > 0 && this.xPos >= 0) {
+        this.xPos -=5;
+        this.positionDOMElement();
+      } else if (this.lifePoints > 0 && this.xPos <= 600) {
+        this.xPos +=5;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
 
   }
 
@@ -1046,391 +1226,32 @@ let levelTimeouts = [];
 
     // Wave 1
     // type5(1,0);
-      type1(8,0);
-      type2(10,8000);
-      type3(8,10000);
-      type2(14,15000);
-      type4(8,20000);
-      type2(14,27000);
-      type1(8,35000);
-       // Delay for each wave
+    createEnemiesOfClass('type1', 8, 0);
+    createEnemiesOfClass('type2', 10,8000);
+    createEnemiesOfClass('type3', 8,10000);
+    createEnemiesOfClass('type2', 14,15000);
+    createEnemiesOfClass('type4', 8,20000);
+    createEnemiesOfClass('type2', 14,27000);
+    createEnemiesOfClass('type1', 8, 35000);
+    // Delay for each wave
 
     // Wave 2
     levelTimeouts.push(setTimeout(function() {
-      type2(8,0);
-      type3(10,8000);
-      type4(8,10000);
-      type1(14,15000);
-      type3(8,20000);
-      type2(14,27000);
-      type3(8,35000);
+      createEnemiesOfClass('type2', 8,0);
+      createEnemiesOfClass('type3', 10,8000);
+      createEnemiesOfClass('type4', 8,10000);
+      createEnemiesOfClass('type1', 14, 15000);
+      createEnemiesOfClass('type3', 8,20000);
+      createEnemiesOfClass('type2', 14,27000);
+      createEnemiesOfClass('type3', 8,35000);
     }, 40000)); //Delay for each wave
 
   // wave3();
   }
 
-  function type1(numberOfEnemies,delay) {
-    levelTimeouts.push(setTimeout(function() {
-      console.log(levelTimeouts);
-      if(gameActive) {
-        const enemyX = 1000;
-        const enemyY = -37.5;
-        const lifePoints = 1;
-        const score = 10;
-        let i = numberOfEnemies;
-        const releaseEnemy = setInterval(function() {
-          if (gameActive === false) {
-            clearInterval(releaseEnemy);
-          } else if(i > 0) {
-            i-=1;
-            const spawnedEnemy = new Enemy('type1', enemyX, enemyY, enemyId, lifePoints , score);
-            // console.log(spawnedEnemy);
-            enemiesInPlay.push(spawnedEnemy);
-            spawnedEnemy.createType1Enemy();
-          } else {
-            clearInterval(releaseEnemy);
-          }
-        },700 //********** rate at which type 1 enemies spawn *************//
-        );
-      }
-    },delay //************** delay for when type 2 initiates *****************//
-    ));
-  }
-
-  function type2(numberOfEnemies,delay) {
-    levelTimeouts.push(setTimeout(function() {
-      console.log(levelTimeouts);
-      if(gameActive) {
-      const enemyX = 1000;
-      const enemyY = 575;
-      const lifePoints = 2;
-      const score = 25;
-      let i = numberOfEnemies;
-      const releaseEnemy = setInterval(function() {
-        if (gameActive === false) {
-          clearInterval(releaseEnemy);
-        } else if(i > 0) {
-          i-=1;
-          const spawnedEnemy = new Enemy('type2', enemyX, enemyY, enemyId, lifePoints, score);
-          enemiesInPlay.push(spawnedEnemy);
-          spawnedEnemy.createType2Enemy();
-          // console.log(enemiesInPlay[index]);
-        } else {
-          clearInterval(releaseEnemy);
-        }
-      },
-      700 //********** rate at which type 2 enemies spawn *************//
-      );
-    }
-    },
-    delay //************** delay for when wave 2 initiates *****************//
-  ));
-  }
-
-  function type3(numberOfEnemies,delay) {
-    levelTimeouts.push(setTimeout(function() {
-      console.log(levelTimeouts);
-      if(gameActive) {
-      const enemyX = 1000;
-      const enemyY = 300;
-      const lifePoints = 1;
-      const score = 10;
-      let i = numberOfEnemies;
-      const releaseEnemy = setInterval(function() {
-        if (gameActive === false) {
-          clearInterval(releaseEnemy);
-        } else if(i > 0) {
-          i-=1;
-          const spawnedEnemy = new Enemy('type3', enemyX, enemyY, enemyId, lifePoints, score);
-          enemiesInPlay.push(spawnedEnemy);
-          spawnedEnemy.createType3Enemy();
-        } else {
-          clearInterval(releaseEnemy);
-        }
-      },
-      700 //********** rate at which type 2 enemies spawn *************//
-      );
-    }
-    },
-    delay //************** delay for when type 2 initiates *****************//
-  ));
-  }
-
-  function type4(numberOfEnemies,delay) {
-    levelTimeouts.push(setTimeout(function() {
-      console.log(levelTimeouts);
-      if(gameActive) {
-      const enemyX = 400;
-      const enemyY = -50;
-      const lifePoints = 1;
-      const score = 10;
-      let i = numberOfEnemies;
-      const releaseEnemy = setInterval(function() {
-        if (gameActive === false) {
-          clearInterval(releaseEnemy);
-        } else if(i > 0) {
-          i-=1;
-          const spawnedEnemy = new Enemy('type4', enemyX, enemyY, enemyId, lifePoints, score);
-          enemiesInPlay.push(spawnedEnemy);
-          spawnedEnemy.createType4Enemy();
-        } else {
-          clearInterval(releaseEnemy);
-        }
-      },
-      700 //********** rate at which type 2 enemies spawn *************//
-      );
-    }
-    },
-    delay //************** delay for when type 2 initiates *****************//
-  ));
-  }
-
-  function type5(numberOfEnemies,delay) {
-    levelTimeouts.push(setTimeout(function() {
-      console.log(levelTimeouts);
-      if(gameActive) {
-      const enemyX = 600;
-      const enemyY = 100;
-      const lifePoints = 200;
-      const score = 1500;
-      let i = numberOfEnemies;
-      const releaseEnemy = setInterval(function() {
-        if (gameActive === false) {
-          clearInterval(releaseEnemy);
-        } else if(i > 0) {
-          i-=1;
-          const spawnedEnemy = new Enemy('type5', enemyX, enemyY, enemyId, lifePoints, score);
-          enemiesInPlay.push(spawnedEnemy);
-          spawnedEnemy.createType5Enemy();
-        } else {
-          clearInterval(releaseEnemy);
-        }
-      },
-      0 //********** rate at which type 2 enemies spawn *************//
-      );
-    }
-    },
-    delay //************** delay for when type 2 initiates *****************//
-  ));
-  }
-
-  Enemy.prototype.createType1Enemy = function() {
-    enemyId +=1;
-    const drone = document.createElement('div');
-    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    drone.setAttribute('class', this.class);
-    playingField.appendChild(drone);
-    // console.log(this);
-    this.type1Travel(drone);
-    this.collisionDetect(drone);
-  };
-
-  Enemy.prototype.createType2Enemy = function() {
-    enemyId +=1;
-    const drone = document.createElement('div');
-    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    drone.setAttribute('class', this.class);
-    playingField.appendChild(drone);
-    // console.log(this);
-    this.type2Travel(drone);
-    this.collisionDetect(drone);
-  };
-
-  Enemy.prototype.createType3Enemy = function() {
-    enemyId +=1;
-    const drone = document.createElement('div');
-    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    drone.setAttribute('class', this.class);
-    playingField.appendChild(drone);
-    // console.log(this);
-    this.type3Travel(drone);
-    this.collisionDetect(drone);
-  };
-
-  Enemy.prototype.createType4Enemy = function() {
-    enemyId +=1;
-    const drone = document.createElement('div');
-    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    drone.setAttribute('class', this.class);
-    playingField.appendChild(drone);
-    // console.log(this);
-    this.type4Travel(drone);
-    this.collisionDetect(drone);
-  };
-
-  Enemy.prototype.createType5Enemy = function() {
-    enemyId +=1;
-    const drone = document.createElement('div');
-    drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
-    drone.setAttribute('class', this.class);
-    playingField.appendChild(drone);
-    // console.log(this);
-    this.type5Travel(drone);
-    this.collisionDetect(drone);
-  };
- let levelIntervals = [];
+  let levelIntervals = [];
   //Below needs to be applied to the created enemy belonging to that object,
   //so invoke on creation.
-  Enemy.prototype.type1Travel = function(drone) {
-    // console.log(enemiesInPlay.length);
-    const _this = this;
-    const movement = setInterval(function() {
-      console.log(playingField.children.length)
-      //starting xPos is 1000
-      if(_this.xPos > 412.5) {
-        _this.xPos -= 5;
-        _this.yPos += 5;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if (_this.xPos > -50) {
-        _this.xPos -= 5;
-        _this.yPos -= 5;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if(playingField.children.length > 0) {
-        console.log('should remove');
-        // Remove from enemiesInPlay
-        enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
-        // Remove the DOM element
-        if(drone.parentNode) {
-          drone.parentNode.removeChild(drone);
-        }
-        clearInterval(movement);
-      }
-    },50);
-    levelIntervals.push(movement); //rate at which enemies move
-  };
-
-  Enemy.prototype.type2Travel = function(drone) {
-    // console.log(enemiesInPlay.length);
-    const _this = this;
-    const movement = setInterval(function() {
-      //starting xPos is 1000
-      if(_this.xPos > 412.5) {
-        _this.xPos -= 5;
-        _this.yPos -= 5;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if (_this.xPos > -50) {
-        _this.xPos -= 5;
-        _this.yPos += 5;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if(playingField.children.length > 0) {
-        enemiesInPlay.forEach(object => {
-          if (object.id === _this.id) {
-            // console.log(object.id);
-            // console.log(_this.id);
-            // console.log(enemiesInPlay.length);
-            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone  && playingField.children.length > 0) {
-              drone.parentNode.removeChild(drone);
-            }
-            clearInterval(movement);
-          }
-        });
-      }
-    },50);
-      levelIntervals.push(movement); //rate at which enemies
-  };
-
-  Enemy.prototype.type3Travel = function(drone) {
-    // console.log(enemiesInPlay.length);
-    const _this = this;
-    const movement = setInterval(function() {
-      //starting xPos is 1000
-      if (_this.xPos > -50) {
-        _this.xPos -= 5;
-        drone.style.left = _this.xPos + 'px';
-      } else if(playingField.children.length > 0) {
-        enemiesInPlay.forEach(object => {
-          if (object.id === _this.id) {
-            // console.log(object.id);
-            // console.log(_this.id);
-            // console.log(enemiesInPlay.length);
-            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone  && playingField.children.length > 0) {
-              drone.parentNode.removeChild(drone);
-            }
-            clearInterval(movement);
-          }
-        });
-      }
-    },50);
-      levelIntervals.push(movement); //rate at which enemies
-  };
-
-  Enemy.prototype.type4Travel = function(drone) {
-    // console.log(enemiesInPlay.length);
-    const _this = this;
-    const movement = setInterval(function() {
-      //starting xPos is 1000
-      if (_this.yPos < 300 - 50) {
-        _this.yPos += 10;
-        _this.xPos += 1;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if (_this.yPos < 600) {
-        _this.yPos += 5;
-        _this.xPos -= 1;
-        drone.style.left = _this.xPos + 'px';
-        drone.style.top = _this.yPos + 'px';
-      } else if(playingField.children.length > 0) {
-        enemiesInPlay.forEach(object => {
-          if (object.id === _this.id) {
-            // console.log(object.id);
-            // console.log(_this.id);
-            // console.log(enemiesInPlay.length);
-            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone && playingField.children.length > 0) {
-              drone.parentNode.removeChild(drone);
-            }
-            clearInterval(movement);
-          }
-        });
-      }
-    },50);
-      levelIntervals.push(movement);//rate at which enemies
-  };
-
-  Enemy.prototype.type5Travel = function(drone) {
-    // console.log(enemiesInPlay.length);
-    const _this = this;
-    const movement = setInterval(function() {
-      //starting xPos is 1000
-      if (_this.lifePoints > 100 && _this.xPos >= 0) {
-        _this.xPos -= 2;
-        drone.style.left = _this.xPos + 'px';
-      } else if (_this.lifePoints > 50 && _this.xPos <= 600 && _this.xPos >= 0  ) {
-        _this.xPos +=5;
-        drone.style.left = _this.xPos + 'px';
-      } else if (_this.lifePoints > 0 && _this.xPos >= 0) {
-        _this.xPos -=5;
-        drone.style.left = _this.xPos + 'px';
-      } else if (_this.lifePoints > 0 && _this.xPos <= 600) {
-        _this.xPos +=5;
-        drone.style.left = _this.xPos + 'px';
-      } else if(playingField.children.length > 0) {
-        enemiesInPlay.forEach(object => {
-          if (object.id === _this.id) {
-            // console.log(object.id);
-            // console.log(_this.id);
-            // console.log(enemiesInPlay.length);
-            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone && playingField.children.length > 0) {
-              drone.parentNode.removeChild(drone);
-            }
-            clearInterval(movement);
-          }
-        });
-      }
-    },50);
-      levelIntervals.push(movement);//rate at which enemies
-  };
 
   Enemy.prototype.collisionDetect = function(drone) {
     //index focuses on the last player created
