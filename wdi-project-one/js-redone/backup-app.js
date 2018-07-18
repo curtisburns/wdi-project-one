@@ -301,9 +301,9 @@ function p1CycleRight() {
     p2ScoreCount = 0;
     p1UpdateScore();
     p2UpdateScore();
-    createPlayer('player1')
+    startPlayer1Life();
     if (player2ModeActive === true) {
-      createPlayer('player2')
+      startPlayer2Life();
     }
   }
 
@@ -336,35 +336,13 @@ function p1CycleRight() {
   let player1;
   let player2;
 
-  const players = {
-    player1: {
-      x: 0,
-      y: 250,
-      kills: 0,
-      lifePoints: 1,
-      width: 70,
-      height: 25,
-      invincible: true
-    },
-
-    player2: {
-      x: 0,
-      y: 280,
-      kills: 0,
-      lifePoints: 1,
-      width: 70,
-      height: 25,
-      invincible: true
-    }
-  };
-
-// TODO:Must add more enemy waves and boss
+  // TODO: Update types 3 4 and 5
   const enemyTypes = {
     type1: { x: 1000, y: -37.5, lifePoints: 1, score: 10 },
     type2: { x: 1000, y: 575, lifePoints: 2, score: 25 },
     type3: { x: 1000, y: 300, lifePoints: 1, score: 10 },
-    type4: { x: 350, y: -37.5, lifePoints: 1, score: 10 },
-    type5: { x: 1000, y: 250, lifePoints: 200, score: 1000 }
+    type4: { x: 1000, y: -37.5, lifePoints: 1, score: 10 },
+    type5: { x: 1000, y: -37.5, lifePoints: 1, score: 10 }
   };
   //   //////////////////////////////////////////////////////
 
@@ -582,68 +560,143 @@ function p1CycleRight() {
     p2Score.textContent = inputScore;
   }
   /////////////////////////////////////////////////////
-
-
-
-
-
-
-  ///////////////////////Player Creation////////////////////
-  function createPlayer(playerClass) {
-    const spawnedPlayer = new Player(playerClass);
-    const playerRecord = playerClass === 'player1'? player1Record : player2Record;
-    playerRecord.push(spawnedPlayer);
+  ///////////////////////Player////////////////////
+  function Player(
+    playerClass,
+    xPos,
+    yPos,
+    distanceTravelled,
+    enemiesKilled,
+    powerUp,
+    lifePoints,
+    invincible,
+    width,
+    height
+  ) {
+    //*************playerStats***********//
+    this.class = playerClass;
+    this.xPos = xPos;
+    this.yPos = yPos;
+    this.distanceTravelled = distanceTravelled;
+    this.enemiesKilled = enemiesKilled;
+    this.powerUp = powerUp;
+    this.lifePoints = lifePoints;
+    this.invincible = invincible;
+    this.width = width;
+    this.height = height;
   }
 
-  class Player {
-    constructor(playerClass) {
-      const player = players[playerClass];
-      this.class = playerClass;
-      this.xPos = player.x;
-      this.yPos = player.y;
-      this.lifePoints = player.lifePoints;
-      this.invincible = player.invincible;
-      this.width = player.width;
-      this.height = player.height;
-      this.initialise();
+  function startPlayer1Life() {
+    if(player1Lives > 0) {
+      const player1X = 0;
+      const player1Y = 250;
+      const playerTravelled = 0;
+      const enemiesKilled = 0;
+      const lifePoints = 1;
+      const invincible = true;
+      const powerUp = 'none';
+      const width = 70;
+      const height = 25;
+      const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
+      //started a record of playerStats
+      player1Record.push(life);
+      // console.log(life.invincible);
+      const index = player1Record.length-1;
+      player1Record[index].createPlayer1();
     }
+  }
 
-    initialise() {
-      this.playerElement = document.createElement('div');
-      this.playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
-      this.playerElement.setAttribute('class', this.class);
-      playingField.appendChild(this.playerElement);
-
-      const playerImage = document.createElement('img');
-      playerImage.setAttribute('src', `images/ship${player1Color}.png`);
-      playerImage.setAttribute('style',`width: ${this.width}px;`);
-      this.playerElement.appendChild(playerImage);
-
-      //for movement functions to target DOM element
-      this.class === 'player1' ? player1 = this.playerElement : player2 = this.playerElement;
-
-      this.playerHitBox();
-      const _this = this;
-      levelTimeouts.push(setTimeout(function() {
-        _this.invincible = false;
-        // console.log(_this.invincible);
-      },2000));
+  function startPlayer2Life() {
+    if(player2Lives > 0) {
+      const player2X = 0;
+      const player2Y = 280;
+      const playerTravelled = 0;
+      const enemiesKilled = 0;
+      const lifePoints = 1;
+      const invincible = true;
+      const powerUp = 'none';
+      const width = 70;
+      const height = 25;
+      const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
+      //started a record of playerStats
+      player2Record.push(life);
+      // console.log(player2Record);
+      const index = player2Record.length-1;
+      player2Record[index].createPlayer2();
     }
+  }
 
-    playerHitBox() {
-      const _this = this;
-      const hit = setInterval(function() {
-        if (_this.lifePoints<1) {
-          if(_this.playerElement) {
-            _this.playerElement.parentNode.removeChild(_this.playerElement);
-          }
-          clearInterval(hit);
-          createPlayer(_this.class);
+  Player.prototype.createPlayer1 = function() {
+    const playerElement = document.createElement('div');
+    playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
+    playerElement.setAttribute('class', this.class);
+    playingField.appendChild(playerElement);
+
+    const playerImage = document.createElement('img');
+    playerImage.setAttribute('src', `images/ship${player1Color}.png`);
+    playerImage.setAttribute('style',`width: ${this.width}px;`);
+    playerElement.appendChild(playerImage);
+
+    player1 = document.getElementsByClassName('player1')[0];
+    this.player1HitBox(playerElement);
+    const _this = this;
+    setTimeout(function() {
+      _this.invincible = false;
+      // console.log(_this.invincible);
+    },2000);
+  };
+// FINISH THIS FOR P2 and PUT IN IF STATEMENT FOR ENEMY COLLISION, IF INVINCIBLE IS FALSE
+  Player.prototype.createPlayer2 = function() {
+    const playerElement = document.createElement('div');
+    playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
+    playerElement.setAttribute('class', this.class);
+    playingField.appendChild(playerElement);
+
+    const playerImage = document.createElement('img');
+    playerImage.setAttribute('src', `images/ship${player2Color}.png`);
+    playerImage.setAttribute('style',`width: ${this.width}px;`);
+    playerElement.appendChild(playerImage);
+
+    player2 = document.getElementsByClassName('player2')[0];
+    this.player2HitBox(playerElement);
+    const _this = this;
+    setTimeout(function() {
+      _this.invincible = false;
+    },2000);
+  };
+
+  Player.prototype.player1HitBox = function(playerElement) {
+    const _this = this;
+    const hit = setInterval(function() {
+      if (_this.lifePoints<1) {
+        // console.log('I am true');
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(playerElement) {
+          playerElement.parentNode.removeChild(playerElement);
         }
-      },50);
-      levelIntervals.push(hit);
-    }
-  }
+        clearInterval(hit);
+        startPlayer1Life();
+      }
+    },50);
+  };
+
+  Player.prototype.player2HitBox = function(playerElement) {
+    const _this = this;
+    const hit = setInterval(function() {
+      if (_this.lifePoints<1) {
+        // console.log('I am true');
+        //a check for if the element has been deleted for any reason before this function could do it.
+        if(playerElement) {
+          playerElement.parentNode.removeChild(playerElement);
+        }
+        clearInterval(hit);
+        startPlayer2Life();
+      }
+    },50);
+  };
+
+  ///////////////////////////////////////////////////////
+
 
 
 
