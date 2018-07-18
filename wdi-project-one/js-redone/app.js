@@ -37,57 +37,245 @@ const gameWidth = 1000; //can use this in calculations below - still need to ref
 /////////////////////////////////////////
 
 //////////createIntro/////////
+//
+// const introScreen = document.createElement('div');
+// introScreen.setAttribute('class','introScreen');
+// introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+// game.appendChild(introScreen);
+//
+// const logo = document.createElement('img');
+// logo.setAttribute('class','logo');
+// logo.setAttribute('style', 'left: 302px; top: 100px;');
+// logo.setAttribute('src', 'images/general-assembly-seeklogo.com.png');
+// introScreen.appendChild(logo);
+//
+// const letterG = document.createElement('img');
+// letterG.setAttribute('class','letter-g');
+// letterG.setAttribute('style', 'left: 374px; top: 156px;');
+// letterG.setAttribute('src', 'images/general-assembly-letter-G.png');
+// introScreen.appendChild(letterG);
+//
+// const letterA = document.createElement('img');
+// letterA.setAttribute('class','letter-a');
+// letterA.setAttribute('style', 'left: 463px; top: 165px;');
+// letterA.setAttribute('src', 'images/general-assembly-letter-A.png');
+// introScreen.appendChild(letterA);
+//
+// const alactic = document.createElement('div');
+// alactic.setAttribute('class','alactic');
+// alactic.setAttribute('style', 'left: 270px; top: 100px;');
+// alactic.textContent = 'alactic';
+// introScreen.appendChild(alactic);
+//
+// const ssembly = document.createElement('div');
+// ssembly.setAttribute('class','ssembly');
+// ssembly.setAttribute('style', 'left: 350px; top: 330px;');
+// ssembly.textContent = 'ssembly';
+// introScreen.appendChild(ssembly);
+//
+// const aHole = document.createElement('div');
+// aHole.setAttribute('class','a-hole');
+// aHole.setAttribute('style', 'left: 287px; top: 362px; width: 36px; height: 36px;');
+// introScreen.appendChild(aHole);
+//
+// setTimeout(function() {
+//   const startGameButton = document.createElement('div');
+//   startGameButton.setAttribute('class','start-game-button');
+//   startGameButton.setAttribute('style', 'left: 360px; top: 530px;');
+//   startGameButton.textContent = 'insert bit coin';
+//   introScreen.appendChild(startGameButton);
+//
+//     setTimeout(function() {
+//       startGameButton.textContent = 'start game';
+//       startGameButton.addEventListener('click', endIntro);
+//       function endIntro() {
+//         aHole.classList.add('animate-a-hole');
+//         setTimeout(function() {
+//           introScreen.parentNode.removeChild(introScreen);
+//         },1000);
+//       }
+//     }, 2500);
+//   }, 4500);
+/////////////////////////////////////////////////
+////////////player selection/startgame///////////////
+let player2ModeActive = false; //will be included in intro so player can select.
+let player1Color = 1;
+let player2Color = 2;
+const playerSelectScreen = document.createElement('div');
+playerSelectScreen.setAttribute('class','playerSelectScreen');
+playerSelectScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+game.appendChild(playerSelectScreen);
 
-const introScreen = document.createElement('div');
-introScreen.setAttribute('class','introScreen');
-introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
-game.appendChild(introScreen);
+const player1Heading = document.createElement('div');
+player1Heading.setAttribute('class','player1Heading');
+player1Heading.setAttribute('style', `width: 200px; height: 30px; top:${(gameHeight/2)-100}px; right:${gameWidth-300}px`);
+player1Heading.textContent = 'Player 1'
+playerSelectScreen.appendChild(player1Heading);
 
-const logo = document.createElement('img');
-logo.setAttribute('class','logo');
-logo.setAttribute('style', 'left: 290px; top: 100px;');
-logo.setAttribute('src', 'images/general-assembly-seeklogo.com.png');
-game.appendChild(logo);
+const player1Character = document.createElement('div');
+player1Character.setAttribute('class','player1Character');
+player1Character.setAttribute('style', `width: 200px; height: 100px; top:${(gameHeight/2)-50}px; right:${gameWidth-300}px;`);
+const char1Image = document.createElement('img');
+char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+char1Image.setAttribute('style', 'width: 160px; height: 55px');
+player1Character.appendChild(char1Image);
+playerSelectScreen.appendChild(player1Character);
 
-const letterG = document.createElement('img');
-letterG.setAttribute('class','letter-g');
-letterG.setAttribute('style', 'left: 362px; top: 156px;');
-letterG.setAttribute('src', 'images/general-assembly-letter-G.png');
-game.appendChild(letterG);
+const player1SelectLeft = document.createElement('div');
+player1SelectLeft .setAttribute('class','player1SelectLeft');
+player1SelectLeft .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-100}px; background:   url(images/arrowleft.png) center/160%`);
+playerSelectScreen.appendChild(player1SelectLeft );
 
-const letterA = document.createElement('img');
-letterA.setAttribute('class','letter-a');
-letterA.setAttribute('style', 'left: 451px; top: 165px;');
-letterA.setAttribute('src', 'images/general-assembly-letter-A.png');
-game.appendChild(letterA);
+player1SelectLeft.addEventListener('click', p1CycleLeft);
 
-const alactic = document.createElement('div');
-alactic.setAttribute('class','alactic');
-alactic.setAttribute('style', 'left: 270px; top: 100px;');
-alactic.textContent = 'alactic';
-game.appendChild(alactic);
+function p1CycleLeft() {
+  if(player1Color-1 < 1) {
+    player1Color=5;
+    char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+  } else {
+    player1Color-=1;
+    char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+  }
+}
 
-const ssembly = document.createElement('div');
-ssembly.setAttribute('class','ssembly');
-ssembly.setAttribute('style', 'left: 350px; top: 330px;');
-ssembly.textContent = 'ssembly';
-game.appendChild(ssembly);
 
+
+
+const player1SelectRight = document.createElement('div');
+player1SelectRight .setAttribute('class','player1SelectRight');
+player1SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
+playerSelectScreen.appendChild(player1SelectRight );
+
+player1SelectRight.addEventListener('click', p1CycleRight);
+
+function p1CycleRight() {
+  console.log(player1Color);
+  if(player1Color+1 > 5) {
+    player1Color=1;
+    char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+  } else {
+    player1Color+=1;
+    char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+  }
+}
+
+
+const selectMode = document.createElement('div');
+selectMode.setAttribute('class','selectMode');
+selectMode .setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-70}px; right:${gameWidth/2-100}px`);
+selectMode.textContent = 'Select mode';
+playerSelectScreen.appendChild(selectMode);
+
+const player2Mode = document.createElement('div');
+player2Mode.setAttribute('class','player2Mode');
+player2Mode.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth/2-100}px`);
+player2Mode.textContent = '1 Player';
+playerSelectScreen.appendChild(player2Mode);
+
+  function player2Active() {
+    if(player2ModeActive) {
+      player2ModeActive = false;
+      removePlayer2Options();
+    } else {
+      player2ModeActive = true;
+      showPlayer2Options();
+    }
+  }
+
+player2Mode.addEventListener('click',player2Active);
+
+  let player2Character;
+  let player2SelectLeft;
+  let player2SelectRight;
+  let player2Heading;
+
+  function showPlayer2Options() {
+    player2Mode .textContent = '2 Players';
+    player2Heading = document.createElement('div');
+    player2Heading.setAttribute('class','player2Heading');
+    player2Heading.setAttribute('style', `width: 200px; height: 30px; top:${(gameHeight/2)-100}px; left:${gameWidth-300}px`);
+    player2Heading.textContent = 'Player 2';
+    playerSelectScreen.appendChild(player2Heading);
+
+    player2Character = document.createElement('div');
+    player2Character.setAttribute('class','player2Character');
+    player2Character.setAttribute('style', `width: 200px; height: 100px; top:${(gameHeight/2)-50}px; left:${gameWidth-300}px;`);
+    playerSelectScreen.appendChild(player2Character);
+    const char2Image = document.createElement('img');
+    char2Image.setAttribute('src', `images/ship${player2Color}.png`);
+    char2Image.setAttribute('style', 'width: 160px; height: 55px');
+    player2Character.appendChild(char2Image);
+
+
+    player2SelectLeft = document.createElement('div');
+    player2SelectLeft .setAttribute('class','player2SelectLeft');
+    player2SelectLeft .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; left:${gameWidth-350}px; background:   url(images/arrowleft.png) center/160%`);
+    playerSelectScreen.appendChild(player2SelectLeft );
+
+    player2SelectLeft.addEventListener('click', p2CycleLeft);
+
+    function p2CycleLeft() {
+      console.log(player2Color);
+      if(player2Color-1 < 1) {
+        player2Color= 5;
+        char2Image.setAttribute('src', `images/ship${player2Color}.png`);
+      } else {
+        player2Color-=1;
+        char2Image.setAttribute('src', `images/ship${player2Color}.png`);
+      }
+    }
+
+    player2SelectRight = document.createElement('div');
+    player2SelectRight .setAttribute('class','player2SelectRight');
+    player2SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; left:${gameWidth-100}px; background:   url(images/arrowright.png) center/160%`);
+    playerSelectScreen.appendChild(player2SelectRight );
+
+    player2SelectRight.addEventListener('click', p2CycleRight);
+
+    function p2CycleRight() {
+      console.log(player2Color);
+      if(player2Color+1 > 5) {
+        player2Color=1;
+        char2Image.setAttribute('src', `images/ship${player2Color}.png`);
+      } else {
+        player2Color+=1;
+        char2Image.setAttribute('src', `images/ship${player2Color}.png`);
+      }
+    }
+  }
+
+  function removePlayer2Options() {
+    player2Mode .textContent = '1 Player';
+    player2Character.parentNode.removeChild(player2Character);
+    player2SelectLeft.parentNode.removeChild(player2SelectLeft);
+    player2SelectRight.parentNode.removeChild(player2SelectRight);
+    player2Heading.parentNode.removeChild(player2Heading);
+  }
+
+
+  const createStartButton = document.createElement('div');
+  createStartButton.setAttribute('class','start-mission');
+  createStartButton.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight-150}px; left:${gameWidth/2-100}px`);
+  createStartButton.textContent = 'start mission';
+  playerSelectScreen.appendChild(createStartButton);
+
+  const startButton = document.getElementsByClassName('start-mission')[0];
+  startButton.addEventListener('click',startGame);
 
 //   ////////////////Declarations///////////////////////
 
-  let player2Mode = true; //will be included in intro so player can select.
+
   const p1Score = document.getElementsByClassName('p1-score')[0];
   const p2Score = document.getElementsByClassName('p2-score')[0];
   let p1ScoreCount;
   let p2ScoreCount;
   let p1LivesUsed = 0;
   let p2LivesUsed = 0;
-  const enemiesInPlay = [];
+  let enemiesInPlay = [];
   const p1BulletsInPlay = [];
   const p2BulletsInPlay = [];
-  const player1Record = [];
-  const player2Record = [];
+  let player1Record = [];
+  let player2Record = [];
   let p1BulletId = 1; //starts at 1 as this is assigned to the first bullet
   let p2BulletId = 1;
   let enemyId = 0;
@@ -97,7 +285,7 @@ game.appendChild(ssembly);
   let p1ShotPower = 0;
   let p2DefaultShotPower = 0;
   let p2ShotPower = 0;
-  let movementIncrement = 2.5;
+  let movementIncrement = 2.5; //can use this for powerups, will need to distinguish between p1 and p2 though.
   let gameActive = true;
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
@@ -293,6 +481,7 @@ game.appendChild(ssembly);
     if(currentRecord.yPos > 0) {
       currentRecord.yPos-=movementIncrement;
       player.style.top = currentRecord.yPos + 'px';
+
     }
   }
 
@@ -352,8 +541,8 @@ game.appendChild(ssembly);
       const lifePoints = 1;
       const invincible = true;
       const powerUp = 'none';
-      const width = 50;
-      const height = 50;
+      const width = 70;
+      const height = 25;
       const life = new Player('player1', player1X, player1Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
       //started a record of playerStats
       player1Record.push(life);
@@ -372,8 +561,8 @@ game.appendChild(ssembly);
       const lifePoints = 1;
       const invincible = true;
       const powerUp = 'none';
-      const width = 50;
-      const height = 50;
+      const width = 70;
+      const height = 25;
       const life = new Player('player2', player2X, player2Y, playerTravelled, enemiesKilled, powerUp, lifePoints, invincible, width, height);
       //started a record of playerStats
       player2Record.push(life);
@@ -388,6 +577,12 @@ game.appendChild(ssembly);
     playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
     game.appendChild(playerElement);
+
+    const playerImage = document.createElement('img');
+    playerImage.setAttribute('src', `images/ship${player1Color}.png`);
+    playerImage.setAttribute('style',`width: ${this.width}px;`);
+    playerElement.appendChild(playerImage);
+
     player1 = document.getElementsByClassName('player1')[0];
     this.player1HitBox(playerElement);
     const _this = this;
@@ -402,6 +597,12 @@ game.appendChild(ssembly);
     playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
     game.appendChild(playerElement);
+
+    const playerImage = document.createElement('img');
+    playerImage.setAttribute('src', `images/ship${player2Color}.png`);
+    playerImage.setAttribute('style',`width: ${this.width}px;`);
+    playerElement.appendChild(playerImage);
+
     player2 = document.getElementsByClassName('player2')[0];
     this.player2HitBox(playerElement);
     const _this = this;
@@ -513,52 +714,52 @@ game.appendChild(ssembly);
     //index focuses on the last player created
     const player1Index = p1LivesUsed;
     if (player1Record[player1Index]){
-    const bulletX = player1Record[player1Index].xPos;
-    const bulletY = player1Record[player1Index].yPos+15;
-    const hitPoints = 2;
-    const bulletClass = 'bulletLvl2';
-    const bulletWidth = 30;
-    const bulletHeight = 10;
-    const bulletSpeed = 2.5;
-    const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p1BulletsInPlay.push(fire);
-    const index = p1BulletsInPlay.length-1;
-    p1BulletsInPlay[index].p1CreateBullet();
-  }
+      const bulletX = player1Record[player1Index].xPos;
+      const bulletY = player1Record[player1Index].yPos+15;
+      const hitPoints = 2;
+      const bulletClass = 'bulletLvl2';
+      const bulletWidth = 30;
+      const bulletHeight = 10;
+      const bulletSpeed = 2.5;
+      const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p1BulletsInPlay.push(fire);
+      const index = p1BulletsInPlay.length-1;
+      p1BulletsInPlay[index].p1CreateBullet();
+    }
   }
   function p1ShootLvl3() {
     //index focuses on the last player created
     const player1Index = p1LivesUsed;
     if (player1Record[player1Index]){
-    const bulletX = player1Record[player1Index].xPos;
-    const bulletY = player1Record[player1Index].yPos+15;
-    const hitPoints = 3;
-    const bulletClass = 'bulletLvl3';
-    const bulletWidth = 20;
-    const bulletHeight = 15;
-    const bulletSpeed = 2.5;
-    const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p1BulletsInPlay.push(fire);
-    const index = p1BulletsInPlay.length-1;
-    p1BulletsInPlay[index].p1CreateBullet();
-  }
+      const bulletX = player1Record[player1Index].xPos;
+      const bulletY = player1Record[player1Index].yPos+15;
+      const hitPoints = 3;
+      const bulletClass = 'bulletLvl3';
+      const bulletWidth = 20;
+      const bulletHeight = 15;
+      const bulletSpeed = 2.5;
+      const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p1BulletsInPlay.push(fire);
+      const index = p1BulletsInPlay.length-1;
+      p1BulletsInPlay[index].p1CreateBullet();
+    }
   }
   function p1ShootMax() {
     //index focuses on the last player created
     const player1Index = p1LivesUsed;
     if (player1Record[player1Index]){
-    const bulletX = player1Record[player1Index].xPos;
-    const bulletY = player1Record[player1Index].yPos+15;
-    const hitPoints = 10;
-    const bulletClass = 'bulletLvlMax';
-    const bulletWidth = 15;
-    const bulletHeight = 15;
-    const bulletSpeed = 5;
-    const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p1BulletsInPlay.push(fire);
-    const index = p1BulletsInPlay.length-1;
-    p1BulletsInPlay[index].p1CreateBullet();
-  }
+      const bulletX = player1Record[player1Index].xPos;
+      const bulletY = player1Record[player1Index].yPos+15;
+      const hitPoints = 10;
+      const bulletClass = 'bulletLvlMax';
+      const bulletWidth = 15;
+      const bulletHeight = 15;
+      const bulletSpeed = 5;
+      const fire = new Bullet(bulletX,bulletY,p1BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p1BulletsInPlay.push(fire);
+      const index = p1BulletsInPlay.length-1;
+      p1BulletsInPlay[index].p1CreateBullet();
+    }
   }
 
   function p2ChargeShot() {
@@ -596,69 +797,69 @@ game.appendChild(ssembly);
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
     if (player2Record[player2Index]){
-    const bulletX = player2Record[player2Index].xPos;
-    const bulletY = player2Record[player2Index].yPos+15;
-    const hitPoints = 1;
-    const bulletClass = 'bulletLvl1';
-    const bulletWidth = 50;
-    const bulletHeight = 10;
-    const bulletSpeed = 2.5;
-    const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass, bulletWidth, bulletHeight, bulletSpeed);
-    p2BulletsInPlay.push(fire);
-    const index = p2BulletsInPlay.length-1;
-    p2BulletsInPlay[index].p2CreateBullet();
-  }
+      const bulletX = player2Record[player2Index].xPos;
+      const bulletY = player2Record[player2Index].yPos+15;
+      const hitPoints = 1;
+      const bulletClass = 'bulletLvl1';
+      const bulletWidth = 50;
+      const bulletHeight = 10;
+      const bulletSpeed = 2.5;
+      const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass, bulletWidth, bulletHeight, bulletSpeed);
+      p2BulletsInPlay.push(fire);
+      const index = p2BulletsInPlay.length-1;
+      p2BulletsInPlay[index].p2CreateBullet();
+    }
   }
   function p2ShootLvl2() {
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
-      if (player2Record[player2Index]){
-    const bulletX = player2Record[player2Index].xPos;
-    const bulletY = player2Record[player2Index].yPos+15;
-    const hitPoints = 2;
-    const bulletClass = 'bulletLvl2';
-    const bulletWidth = 40;
-    const bulletHeight = 10;
-    const bulletSpeed = 2.5;
-    const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p2BulletsInPlay.push(fire);
-    const index = p2BulletsInPlay.length-1;
-    p2BulletsInPlay[index].p2CreateBullet();
-  }
+    if (player2Record[player2Index]){
+      const bulletX = player2Record[player2Index].xPos;
+      const bulletY = player2Record[player2Index].yPos+15;
+      const hitPoints = 2;
+      const bulletClass = 'bulletLvl2';
+      const bulletWidth = 40;
+      const bulletHeight = 10;
+      const bulletSpeed = 2.5;
+      const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p2BulletsInPlay.push(fire);
+      const index = p2BulletsInPlay.length-1;
+      p2BulletsInPlay[index].p2CreateBullet();
+    }
   }
   function p2ShootLvl3() {
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
-      if (player2Record[player2Index]){
-    const bulletX = player2Record[player2Index].xPos;
-    const bulletY = player2Record[player2Index].yPos+15;
-    const hitPoints = 3;
-    const bulletClass = 'bulletLvl3';
-    const bulletWidth = 30;
-    const bulletHeight = 15;
-    const bulletSpeed = 2.5;
-    const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p2BulletsInPlay.push(fire);
-    const index = p2BulletsInPlay.length-1;
-    p2BulletsInPlay[index].p2CreateBullet();
-  }
+    if (player2Record[player2Index]){
+      const bulletX = player2Record[player2Index].xPos;
+      const bulletY = player2Record[player2Index].yPos+15;
+      const hitPoints = 3;
+      const bulletClass = 'bulletLvl3';
+      const bulletWidth = 30;
+      const bulletHeight = 15;
+      const bulletSpeed = 2.5;
+      const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p2BulletsInPlay.push(fire);
+      const index = p2BulletsInPlay.length-1;
+      p2BulletsInPlay[index].p2CreateBullet();
+    }
   }
   function p2ShootMax() {
     //index focuses on the last player created
     const player2Index = p2LivesUsed;
-      if (player2Record[player2Index]){
-    const bulletX = player2Record[player2Index].xPos;
-    const bulletY = player2Record[player2Index].yPos+15;
-    const hitPoints = 10;
-    const bulletClass = 'bulletLvlMax';
-    const bulletWidth = 15;
-    const bulletHeight = 15;
-    const bulletSpeed = 5;
-    const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
-    p2BulletsInPlay.push(fire);
-    const index = p2BulletsInPlay.length-1;
-    p2BulletsInPlay[index].p2CreateBullet();
-  }
+    if (player2Record[player2Index]){
+      const bulletX = player2Record[player2Index].xPos;
+      const bulletY = player2Record[player2Index].yPos+15;
+      const hitPoints = 10;
+      const bulletClass = 'bulletLvlMax';
+      const bulletWidth = 15;
+      const bulletHeight = 15;
+      const bulletSpeed = 5;
+      const fire = new Bullet(bulletX,bulletY,p2BulletId, hitPoints, bulletClass,  bulletWidth, bulletHeight, bulletSpeed);
+      p2BulletsInPlay.push(fire);
+      const index = p2BulletsInPlay.length-1;
+      p2BulletsInPlay[index].p2CreateBullet();
+    }
   }
 
   Bullet.prototype.p1CreateBullet = function() {
@@ -1210,7 +1411,7 @@ game.appendChild(ssembly);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it. Still doesnt work.
             // console.log(drone);
-            if(drone) {
+            if (drone) {
               drone.parentNode.removeChild(drone);
             }
             // console.log(enemiesInPlay.length);
@@ -1295,6 +1496,7 @@ game.appendChild(ssembly);
 
   //////////////////////////Start Game///////////////////////////////////////////
   function startGame() {
+    playerSelectScreen.parentNode.removeChild(playerSelectScreen);
     gameActive = true;
     setTimeout(startWaves, 1000);
     p1ScoreCount = 0;
@@ -1302,7 +1504,7 @@ game.appendChild(ssembly);
     p1UpdateScore();
     p2UpdateScore();
     startPlayer1Life();
-    if (player2Mode === true) {
+    if (player2ModeActive === true) {
       startPlayer2Life();
     }
   }
@@ -1325,8 +1527,7 @@ game.appendChild(ssembly);
 
   }
 
-  const startButton = document.getElementsByClassName('start')[0];
-  startButton.addEventListener('click',startGame);
+
 
 
 //
