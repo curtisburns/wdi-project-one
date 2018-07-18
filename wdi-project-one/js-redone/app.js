@@ -11,7 +11,7 @@ window.onload = () => {
 //and therefore function tries to remove the same drone twice. increase detection rate? tried, still happens
 
 //when using 2nd player, charging, moving forward and moving down does not move down.
-
+//setTimeout on waves needs to be removed on reset.
 //need to fix charge- DONE
 
 //p1 and p2 bullets can be refactored in same way as movement.*********
@@ -37,96 +37,141 @@ const gameWidth = 1000; //can use this in calculations below - still need to ref
 /////////////////////////////////////////
 
 //////////createIntro/////////
-//
-// const introScreen = document.createElement('div');
-// introScreen.setAttribute('class','introScreen');
-// introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
-// game.appendChild(introScreen);
-//
-// const logo = document.createElement('img');
-// logo.setAttribute('class','logo');
-// logo.setAttribute('style', 'left: 302px; top: 100px;');
-// logo.setAttribute('src', 'images/general-assembly-seeklogo.com.png');
-// introScreen.appendChild(logo);
-//
-// const letterG = document.createElement('img');
-// letterG.setAttribute('class','letter-g');
-// letterG.setAttribute('style', 'left: 374px; top: 156px;');
-// letterG.setAttribute('src', 'images/general-assembly-letter-G.png');
-// introScreen.appendChild(letterG);
-//
-// const letterA = document.createElement('img');
-// letterA.setAttribute('class','letter-a');
-// letterA.setAttribute('style', 'left: 463px; top: 165px;');
-// letterA.setAttribute('src', 'images/general-assembly-letter-A.png');
-// introScreen.appendChild(letterA);
-//
-// const alactic = document.createElement('div');
-// alactic.setAttribute('class','alactic');
-// alactic.setAttribute('style', 'left: 270px; top: 100px;');
-// alactic.textContent = 'alactic';
-// introScreen.appendChild(alactic);
-//
-// const ssembly = document.createElement('div');
-// ssembly.setAttribute('class','ssembly');
-// ssembly.setAttribute('style', 'left: 350px; top: 330px;');
-// ssembly.textContent = 'ssembly';
-// introScreen.appendChild(ssembly);
-//
-// const aHole = document.createElement('div');
-// aHole.setAttribute('class','a-hole');
-// aHole.setAttribute('style', 'left: 287px; top: 362px; width: 36px; height: 36px;');
-// introScreen.appendChild(aHole);
-//
-// setTimeout(function() {
-//   const startGameButton = document.createElement('div');
-//   startGameButton.setAttribute('class','start-game-button');
-//   startGameButton.setAttribute('style', 'left: 360px; top: 530px;');
-//   startGameButton.textContent = 'insert bit coin';
-//   introScreen.appendChild(startGameButton);
-//
-//     setTimeout(function() {
-//       startGameButton.textContent = 'start game';
-//       startGameButton.addEventListener('click', endIntro);
-//       function endIntro() {
-//         aHole.classList.add('animate-a-hole');
-//         setTimeout(function() {
-//           introScreen.parentNode.removeChild(introScreen);
-//         },1000);
-//       }
-//     }, 2500);
-//   }, 4500);
+
+const introScreen = document.createElement('div');
+introScreen.setAttribute('class','introScreen');
+introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+game.appendChild(introScreen);
+
+const logo = document.createElement('img');
+logo.setAttribute('class','logo');
+logo.setAttribute('style', 'left: 302px; top: 100px;');
+logo.setAttribute('src', 'images/general-assembly-seeklogo.com.png');
+introScreen.appendChild(logo);
+
+const letterG = document.createElement('img');
+letterG.setAttribute('class','letter-g');
+letterG.setAttribute('style', 'left: 374px; top: 156px;');
+letterG.setAttribute('src', 'images/general-assembly-letter-G.png');
+introScreen.appendChild(letterG);
+
+const letterA = document.createElement('img');
+letterA.setAttribute('class','letter-a');
+letterA.setAttribute('style', 'left: 463px; top: 165px;');
+letterA.setAttribute('src', 'images/general-assembly-letter-A.png');
+introScreen.appendChild(letterA);
+
+const alactic = document.createElement('div');
+alactic.setAttribute('class','alactic');
+alactic.setAttribute('style', 'left: 270px; top: 100px;');
+alactic.textContent = 'alactic';
+introScreen.appendChild(alactic);
+
+const ssembly = document.createElement('div');
+ssembly.setAttribute('class','ssembly');
+ssembly.setAttribute('style', 'left: 350px; top: 330px;');
+ssembly.textContent = 'ssembly';
+introScreen.appendChild(ssembly);
+
+const aHole = document.createElement('div');
+aHole.setAttribute('class','a-hole');
+aHole.setAttribute('style', 'left: 287px; top: 362px; width: 36px; height: 36px;');
+introScreen.appendChild(aHole);
+
+setTimeout(function() {
+  const startGameButton = document.createElement('div');
+  startGameButton.setAttribute('class','start-game-button');
+  startGameButton.setAttribute('style', 'left: 360px; top: 530px;');
+  startGameButton.textContent = 'insert bit coin';
+  introScreen.appendChild(startGameButton);
+
+    setTimeout(function() {
+      startGameButton.textContent = 'start game';
+      startGameButton.addEventListener('click', endIntro);
+      function endIntro() {
+        aHole.classList.add('animate-a-hole');
+        createSelectionScreen()
+        setTimeout(function() {
+          introScreen.parentNode.removeChild(introScreen);
+        },1000);
+      }
+    }, 2500);
+  }, 4500);
 /////////////////////////////////////////////////
 ////////////player selection/startgame///////////////
 let player2ModeActive = false; //will be included in intro so player can select.
 let player1Color = 1;
 let player2Color = 2;
-const playerSelectScreen = document.createElement('div');
-playerSelectScreen.setAttribute('class','playerSelectScreen');
-playerSelectScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
-game.appendChild(playerSelectScreen);
+let char1Image;
+let player2Mode;
+let playerSelectScreen;
+let player1Heading;
+let player1Character;
+let player1SelectLeft;
+let player1SelectRight;
+let selectMode;
+let createStartMissionButton;
+let startMission;
 
-const player1Heading = document.createElement('div');
-player1Heading.setAttribute('class','player1Heading');
-player1Heading.setAttribute('style', `width: 200px; height: 30px; top:${(gameHeight/2)-100}px; right:${gameWidth-300}px`);
-player1Heading.textContent = 'Player 1'
-playerSelectScreen.appendChild(player1Heading);
+function createSelectionScreen() {
+  playerSelectScreen = document.createElement('div');
+  playerSelectScreen.setAttribute('class','playerSelectScreen');
+  playerSelectScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+  game.appendChild(playerSelectScreen);
 
-const player1Character = document.createElement('div');
-player1Character.setAttribute('class','player1Character');
-player1Character.setAttribute('style', `width: 200px; height: 100px; top:${(gameHeight/2)-50}px; right:${gameWidth-300}px;`);
-const char1Image = document.createElement('img');
-char1Image.setAttribute('src', `images/ship${player1Color}.png`);
-char1Image.setAttribute('style', 'width: 160px; height: 55px');
-player1Character.appendChild(char1Image);
-playerSelectScreen.appendChild(player1Character);
+  player1Heading = document.createElement('div');
+  player1Heading.setAttribute('class','player1Heading');
+  player1Heading.setAttribute('style', `width: 200px; height: 30px; top:${(gameHeight/2)-100}px; right:${gameWidth-300}px`);
+  player1Heading.textContent = 'Player 1'
+  playerSelectScreen.appendChild(player1Heading);
 
-const player1SelectLeft = document.createElement('div');
-player1SelectLeft .setAttribute('class','player1SelectLeft');
-player1SelectLeft .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-100}px; background:   url(images/arrowleft.png) center/160%`);
-playerSelectScreen.appendChild(player1SelectLeft );
+  player1Character = document.createElement('div');
+  player1Character.setAttribute('class','player1Character');
+  player1Character.setAttribute('style', `width: 200px; height: 100px; top:${(gameHeight/2)-50}px; right:${gameWidth-300}px;`);
+  char1Image = document.createElement('img');
+  char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+  char1Image.setAttribute('style', 'width: 160px; height: 55px');
+  player1Character.appendChild(char1Image);
+  playerSelectScreen.appendChild(player1Character);
 
-player1SelectLeft.addEventListener('click', p1CycleLeft);
+  player1SelectLeft = document.createElement('div');
+  player1SelectLeft .setAttribute('class','player1SelectLeft');
+  player1SelectLeft .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-100}px; background:   url(images/arrowleft.png) center/160%`);
+  playerSelectScreen.appendChild(player1SelectLeft );
+
+  player1SelectLeft.addEventListener('click', p1CycleLeft);
+
+  player1SelectRight = document.createElement('div');
+  player1SelectRight .setAttribute('class','player1SelectRight');
+  player1SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
+  playerSelectScreen.appendChild(player1SelectRight );
+
+  player1SelectRight.addEventListener('click', p1CycleRight);
+
+  selectMode = document.createElement('div');
+  selectMode.setAttribute('class','selectMode');
+  selectMode .setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-70}px; right:${gameWidth/2-100}px`);
+  selectMode.textContent = 'Select mode';
+  playerSelectScreen.appendChild(selectMode);
+
+  player2Mode = document.createElement('div');
+  player2Mode.setAttribute('class','player2Mode');
+  player2Mode.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth/2-100}px`);
+  player2Mode.textContent = '1 Player';
+  playerSelectScreen.appendChild(player2Mode);
+
+  player2Mode.addEventListener('click',player2Active);
+
+  createStartMissionButton = document.createElement('div');
+  createStartMissionButton.setAttribute('class','start-mission');
+  createStartMissionButton.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight-150}px; left:${gameWidth/2-100}px`);
+  createStartMissionButton.textContent = 'start mission';
+  playerSelectScreen.appendChild(createStartMissionButton);
+
+  startMission = document.getElementsByClassName('start-mission')[0];
+  startMission.addEventListener('click',startGame);
+
+}
 
 function p1CycleLeft() {
   if(player1Color-1 < 1) {
@@ -141,15 +186,9 @@ function p1CycleLeft() {
 
 
 
-const player1SelectRight = document.createElement('div');
-player1SelectRight .setAttribute('class','player1SelectRight');
-player1SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
-playerSelectScreen.appendChild(player1SelectRight );
-
-player1SelectRight.addEventListener('click', p1CycleRight);
 
 function p1CycleRight() {
-  console.log(player1Color);
+  // console.log(player1Color);
   if(player1Color+1 > 5) {
     player1Color=1;
     char1Image.setAttribute('src', `images/ship${player1Color}.png`);
@@ -160,17 +199,6 @@ function p1CycleRight() {
 }
 
 
-const selectMode = document.createElement('div');
-selectMode.setAttribute('class','selectMode');
-selectMode .setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-70}px; right:${gameWidth/2-100}px`);
-selectMode.textContent = 'Select mode';
-playerSelectScreen.appendChild(selectMode);
-
-const player2Mode = document.createElement('div');
-player2Mode.setAttribute('class','player2Mode');
-player2Mode.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth/2-100}px`);
-player2Mode.textContent = '1 Player';
-playerSelectScreen.appendChild(player2Mode);
 
   function player2Active() {
     if(player2ModeActive) {
@@ -182,7 +210,6 @@ playerSelectScreen.appendChild(player2Mode);
     }
   }
 
-player2Mode.addEventListener('click',player2Active);
 
   let player2Character;
   let player2SelectLeft;
@@ -215,7 +242,7 @@ player2Mode.addEventListener('click',player2Active);
     player2SelectLeft.addEventListener('click', p2CycleLeft);
 
     function p2CycleLeft() {
-      console.log(player2Color);
+      // console.log(player2Color);
       if(player2Color-1 < 1) {
         player2Color= 5;
         char2Image.setAttribute('src', `images/ship${player2Color}.png`);
@@ -233,7 +260,7 @@ player2Mode.addEventListener('click',player2Active);
     player2SelectRight.addEventListener('click', p2CycleRight);
 
     function p2CycleRight() {
-      console.log(player2Color);
+      // console.log(player2Color);
       if(player2Color+1 > 5) {
         player2Color=1;
         char2Image.setAttribute('src', `images/ship${player2Color}.png`);
@@ -251,16 +278,34 @@ player2Mode.addEventListener('click',player2Active);
     player2SelectRight.parentNode.removeChild(player2SelectRight);
     player2Heading.parentNode.removeChild(player2Heading);
   }
+ ///createplayingField////////////
 
+ let playingField;
 
-  const createStartButton = document.createElement('div');
-  createStartButton.setAttribute('class','start-mission');
-  createStartButton.setAttribute('style', `width: 200px; height: 50px; top:${gameHeight-150}px; left:${gameWidth/2-100}px`);
-  createStartButton.textContent = 'start mission';
-  playerSelectScreen.appendChild(createStartButton);
-
-  const startButton = document.getElementsByClassName('start-mission')[0];
-  startButton.addEventListener('click',startGame);
+  function startGame() {
+    playerSelectScreen.parentNode.removeChild(playerSelectScreen);
+    playingField = document.createElement('div');
+    playingField.setAttribute('class','playingField');
+    playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+    game.appendChild(playingField);
+    gameActive = true;
+    playingField = document.getElementsByClassName('playingField')[0];
+    if(!playingField) {
+      playingField = document.createElement('div');
+      game.setAttribute('class','playingField');
+      game.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+      game.appendChild(playingField);
+    }
+    setTimeout(startWaves, 1000);
+    p1ScoreCount = 0;
+    p2ScoreCount = 0;
+    p1UpdateScore();
+    p2UpdateScore();
+    startPlayer1Life();
+    if (player2ModeActive === true) {
+      startPlayer2Life();
+    }
+  }
 
 //   ////////////////Declarations///////////////////////
 
@@ -576,7 +621,7 @@ player2Mode.addEventListener('click',player2Active);
     const playerElement = document.createElement('div');
     playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
-    game.appendChild(playerElement);
+    playingField.appendChild(playerElement);
 
     const playerImage = document.createElement('img');
     playerImage.setAttribute('src', `images/ship${player1Color}.png`);
@@ -596,7 +641,7 @@ player2Mode.addEventListener('click',player2Active);
     const playerElement = document.createElement('div');
     playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
     playerElement.setAttribute('class', this.class);
-    game.appendChild(playerElement);
+    playingField.appendChild(playerElement);
 
     const playerImage = document.createElement('img');
     playerImage.setAttribute('src', `images/ship${player2Color}.png`);
@@ -867,7 +912,7 @@ player2Mode.addEventListener('click',player2Active);
     const bullet = document.createElement('div');
     bullet.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px`);
     bullet.setAttribute('class', this.class);
-    game.appendChild(bullet);
+    playingField.appendChild(bullet);
     this.p1Travel(bullet);
     this.p1TargetCheck(bullet);
     // console.log(this.hitTarget);
@@ -880,7 +925,7 @@ player2Mode.addEventListener('click',player2Active);
     const bullet = document.createElement('div');
     bullet.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px`);
     bullet.setAttribute('class', this.class);
-    game.appendChild(bullet);
+    playingField.appendChild(bullet);
     this.p2Travel(bullet);
     this.p2TargetCheck(bullet);
     // console.log(this.hitTarget);
@@ -991,8 +1036,11 @@ player2Mode.addEventListener('click',player2Active);
 
   }
 
+let levelTimeouts = [];
+
   //can setnumber of enemies as a variable at the top if needs be later.
   function startWaves() {
+
     //level creation
     // numberOfEnemies, delay
 
@@ -1008,7 +1056,7 @@ player2Mode.addEventListener('click',player2Active);
        // Delay for each wave
 
     // Wave 2
-    setTimeout(function() {
+    levelTimeouts.push(setTimeout(function() {
       type2(8,0);
       type3(10,8000);
       type4(8,10000);
@@ -1016,40 +1064,43 @@ player2Mode.addEventListener('click',player2Active);
       type3(8,20000);
       type2(14,27000);
       type3(8,35000);
-    }, 40000); //Delay for each wave
+    }, 40000)); //Delay for each wave
 
   // wave3();
   }
 
   function type1(numberOfEnemies,delay) {
-    const timeout = setTimeout(function() {
-      const enemyX = 1000;
-      const enemyY = -37.5;
-      const lifePoints = 1;
-      const score = 10;
-      let i = numberOfEnemies;
-      const releaseEnemy = setInterval(function() {
-        if (gameActive === false) {
-          clearInterval(releaseEnemy);
-          clearTimeout(timeout);
-        } else if(i > 0) {
-          i-=1;
-          const spawnedEnemy = new Enemy('type1', enemyX, enemyY, enemyId, lifePoints , score);
-          // console.log(spawnedEnemy);
-          enemiesInPlay.push(spawnedEnemy);
-          const index = enemiesInPlay.length-1;
-          enemiesInPlay[index].createType1Enemy();
-        } else {
-          clearInterval(releaseEnemy);
-        }
-      },700 //********** rate at which type 1 enemies spawn *************//
-      );
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
+        const enemyX = 1000;
+        const enemyY = -37.5;
+        const lifePoints = 1;
+        const score = 10;
+        let i = numberOfEnemies;
+        const releaseEnemy = setInterval(function() {
+          if (gameActive === false) {
+            clearInterval(releaseEnemy);
+          } else if(i > 0) {
+            i-=1;
+            const spawnedEnemy = new Enemy('type1', enemyX, enemyY, enemyId, lifePoints , score);
+            // console.log(spawnedEnemy);
+            enemiesInPlay.push(spawnedEnemy);
+            spawnedEnemy.createType1Enemy();
+          } else {
+            clearInterval(releaseEnemy);
+          }
+        },700 //********** rate at which type 1 enemies spawn *************//
+        );
+      }
     },delay //************** delay for when type 2 initiates *****************//
-    );
+    ));
   }
 
   function type2(numberOfEnemies,delay) {
-    const timeout = setTimeout(function() {
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
       const enemyX = 1000;
       const enemyY = 575;
       const lifePoints = 2;
@@ -1058,13 +1109,11 @@ player2Mode.addEventListener('click',player2Active);
       const releaseEnemy = setInterval(function() {
         if (gameActive === false) {
           clearInterval(releaseEnemy);
-          clearTimeout(timeout);
         } else if(i > 0) {
           i-=1;
           const spawnedEnemy = new Enemy('type2', enemyX, enemyY, enemyId, lifePoints, score);
           enemiesInPlay.push(spawnedEnemy);
-          const index = enemiesInPlay.length-1;
-          enemiesInPlay[index].createType2Enemy();
+          spawnedEnemy.createType2Enemy();
           // console.log(enemiesInPlay[index]);
         } else {
           clearInterval(releaseEnemy);
@@ -1072,13 +1121,16 @@ player2Mode.addEventListener('click',player2Active);
       },
       700 //********** rate at which type 2 enemies spawn *************//
       );
+    }
     },
     delay //************** delay for when wave 2 initiates *****************//
-    );
+  ));
   }
 
   function type3(numberOfEnemies,delay) {
-    const timeout = setTimeout(function() {
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
       const enemyX = 1000;
       const enemyY = 300;
       const lifePoints = 1;
@@ -1087,26 +1139,27 @@ player2Mode.addEventListener('click',player2Active);
       const releaseEnemy = setInterval(function() {
         if (gameActive === false) {
           clearInterval(releaseEnemy);
-          clearTimeout(timeout);
         } else if(i > 0) {
           i-=1;
           const spawnedEnemy = new Enemy('type3', enemyX, enemyY, enemyId, lifePoints, score);
           enemiesInPlay.push(spawnedEnemy);
-          const index = enemiesInPlay.length-1;
-          enemiesInPlay[index].createType3Enemy();
+          spawnedEnemy.createType3Enemy();
         } else {
           clearInterval(releaseEnemy);
         }
       },
       700 //********** rate at which type 2 enemies spawn *************//
       );
+    }
     },
     delay //************** delay for when type 2 initiates *****************//
-    );
+  ));
   }
 
   function type4(numberOfEnemies,delay) {
-    const timeout = setTimeout(function() {
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
       const enemyX = 400;
       const enemyY = -50;
       const lifePoints = 1;
@@ -1115,26 +1168,27 @@ player2Mode.addEventListener('click',player2Active);
       const releaseEnemy = setInterval(function() {
         if (gameActive === false) {
           clearInterval(releaseEnemy);
-          clearTimeout(timeout);
         } else if(i > 0) {
           i-=1;
           const spawnedEnemy = new Enemy('type4', enemyX, enemyY, enemyId, lifePoints, score);
           enemiesInPlay.push(spawnedEnemy);
-          const index = enemiesInPlay.length-1;
-          enemiesInPlay[index].createType4Enemy();
+          spawnedEnemy.createType4Enemy();
         } else {
           clearInterval(releaseEnemy);
         }
       },
       700 //********** rate at which type 2 enemies spawn *************//
       );
+    }
     },
     delay //************** delay for when type 2 initiates *****************//
-    );
+  ));
   }
 
   function type5(numberOfEnemies,delay) {
-    const timeout = setTimeout(function() {
+    levelTimeouts.push(setTimeout(function() {
+      console.log(levelTimeouts);
+      if(gameActive) {
       const enemyX = 600;
       const enemyY = 100;
       const lifePoints = 200;
@@ -1143,22 +1197,21 @@ player2Mode.addEventListener('click',player2Active);
       const releaseEnemy = setInterval(function() {
         if (gameActive === false) {
           clearInterval(releaseEnemy);
-          clearTimeout(timeout);
         } else if(i > 0) {
           i-=1;
           const spawnedEnemy = new Enemy('type5', enemyX, enemyY, enemyId, lifePoints, score);
           enemiesInPlay.push(spawnedEnemy);
-          const index = enemiesInPlay.length-1;
-          enemiesInPlay[index].createType5Enemy();
+          spawnedEnemy.createType5Enemy();
         } else {
           clearInterval(releaseEnemy);
         }
       },
       0 //********** rate at which type 2 enemies spawn *************//
       );
+    }
     },
     delay //************** delay for when type 2 initiates *****************//
-    );
+  ));
   }
 
   Enemy.prototype.createType1Enemy = function() {
@@ -1166,7 +1219,7 @@ player2Mode.addEventListener('click',player2Active);
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
-    game.appendChild(drone);
+    playingField.appendChild(drone);
     // console.log(this);
     this.type1Travel(drone);
     this.collisionDetect(drone);
@@ -1177,7 +1230,7 @@ player2Mode.addEventListener('click',player2Active);
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
-    game.appendChild(drone);
+    playingField.appendChild(drone);
     // console.log(this);
     this.type2Travel(drone);
     this.collisionDetect(drone);
@@ -1188,7 +1241,7 @@ player2Mode.addEventListener('click',player2Active);
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
-    game.appendChild(drone);
+    playingField.appendChild(drone);
     // console.log(this);
     this.type3Travel(drone);
     this.collisionDetect(drone);
@@ -1199,7 +1252,7 @@ player2Mode.addEventListener('click',player2Active);
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
-    game.appendChild(drone);
+    playingField.appendChild(drone);
     // console.log(this);
     this.type4Travel(drone);
     this.collisionDetect(drone);
@@ -1210,18 +1263,19 @@ player2Mode.addEventListener('click',player2Active);
     const drone = document.createElement('div');
     drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
     drone.setAttribute('class', this.class);
-    game.appendChild(drone);
+    playingField.appendChild(drone);
     // console.log(this);
     this.type5Travel(drone);
     this.collisionDetect(drone);
   };
-
+ let levelIntervals = [];
   //Below needs to be applied to the created enemy belonging to that object,
   //so invoke on creation.
   Enemy.prototype.type1Travel = function(drone) {
     // console.log(enemiesInPlay.length);
     const _this = this;
     const movement = setInterval(function() {
+      console.log(playingField.children.length)
       //starting xPos is 1000
       if(_this.xPos > 412.5) {
         _this.xPos -= 5;
@@ -1233,22 +1287,18 @@ player2Mode.addEventListener('click',player2Active);
         _this.yPos -= 5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
-      } else if(game.children.length > 0) {
-        enemiesInPlay.forEach(object => {
-          if (object.id === _this.id) {
-            // console.log(object.id);
-            // console.log(_this.id);
-            // console.log(enemiesInPlay.length);
-            enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
-            //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone) {
-              drone.parentNode.removeChild(drone);
-            }
-            clearInterval(movement);
-          }
-        });
+      } else if(playingField.children.length > 0) {
+        console.log('should remove');
+        // Remove from enemiesInPlay
+        enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
+        // Remove the DOM element
+        if(drone.parentNode) {
+          drone.parentNode.removeChild(drone);
+        }
+        clearInterval(movement);
       }
-    },50); //rate at which enemies move
+    },50);
+    levelIntervals.push(movement); //rate at which enemies move
   };
 
   Enemy.prototype.type2Travel = function(drone) {
@@ -1266,7 +1316,7 @@ player2Mode.addEventListener('click',player2Active);
         _this.yPos += 5;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
-      } else if(game.children.length > 0) {
+      } else if(playingField.children.length > 0) {
         enemiesInPlay.forEach(object => {
           if (object.id === _this.id) {
             // console.log(object.id);
@@ -1274,14 +1324,15 @@ player2Mode.addEventListener('click',player2Active);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone) {
+            if(drone  && playingField.children.length > 0) {
               drone.parentNode.removeChild(drone);
             }
             clearInterval(movement);
           }
         });
       }
-    },50); //rate at which enemies
+    },50);
+      levelIntervals.push(movement); //rate at which enemies
   };
 
   Enemy.prototype.type3Travel = function(drone) {
@@ -1292,7 +1343,7 @@ player2Mode.addEventListener('click',player2Active);
       if (_this.xPos > -50) {
         _this.xPos -= 5;
         drone.style.left = _this.xPos + 'px';
-      } else if(game.children.length > 0) {
+      } else if(playingField.children.length > 0) {
         enemiesInPlay.forEach(object => {
           if (object.id === _this.id) {
             // console.log(object.id);
@@ -1300,14 +1351,15 @@ player2Mode.addEventListener('click',player2Active);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone) {
+            if(drone  && playingField.children.length > 0) {
               drone.parentNode.removeChild(drone);
             }
             clearInterval(movement);
           }
         });
       }
-    },50); //rate at which enemies
+    },50);
+      levelIntervals.push(movement); //rate at which enemies
   };
 
   Enemy.prototype.type4Travel = function(drone) {
@@ -1325,7 +1377,7 @@ player2Mode.addEventListener('click',player2Active);
         _this.xPos -= 1;
         drone.style.left = _this.xPos + 'px';
         drone.style.top = _this.yPos + 'px';
-      } else if(game.children.length > 0) {
+      } else if(playingField.children.length > 0) {
         enemiesInPlay.forEach(object => {
           if (object.id === _this.id) {
             // console.log(object.id);
@@ -1333,14 +1385,15 @@ player2Mode.addEventListener('click',player2Active);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone) {
+            if(drone && playingField.children.length > 0) {
               drone.parentNode.removeChild(drone);
             }
             clearInterval(movement);
           }
         });
       }
-    },50); //rate at which enemies
+    },50);
+      levelIntervals.push(movement);//rate at which enemies
   };
 
   Enemy.prototype.type5Travel = function(drone) {
@@ -1360,7 +1413,7 @@ player2Mode.addEventListener('click',player2Active);
       } else if (_this.lifePoints > 0 && _this.xPos <= 600) {
         _this.xPos +=5;
         drone.style.left = _this.xPos + 'px';
-      } else if(game.children.length > 0) {
+      } else if(playingField.children.length > 0) {
         enemiesInPlay.forEach(object => {
           if (object.id === _this.id) {
             // console.log(object.id);
@@ -1368,14 +1421,15 @@ player2Mode.addEventListener('click',player2Active);
             // console.log(enemiesInPlay.length);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it.
-            if(drone) {
+            if(drone && playingField.children.length > 0) {
               drone.parentNode.removeChild(drone);
             }
             clearInterval(movement);
           }
         });
       }
-    },50); //rate at which enemies
+    },50);
+      levelIntervals.push(movement);//rate at which enemies
   };
 
   Enemy.prototype.collisionDetect = function(drone) {
@@ -1411,7 +1465,7 @@ player2Mode.addEventListener('click',player2Active);
             enemiesInPlay.splice(enemiesInPlay.indexOf(_this),1);
             //a check for if the element has been deleted for any reason before this function could do it. Still doesnt work.
             // console.log(drone);
-            if (drone) {
+            if (drone.parentNode) {
               drone.parentNode.removeChild(drone);
             }
             // console.log(enemiesInPlay.length);
@@ -1495,25 +1549,14 @@ player2Mode.addEventListener('click',player2Active);
 
 
   //////////////////////////Start Game///////////////////////////////////////////
-  function startGame() {
-    playerSelectScreen.parentNode.removeChild(playerSelectScreen);
-    gameActive = true;
-    setTimeout(startWaves, 1000);
-    p1ScoreCount = 0;
-    p2ScoreCount = 0;
-    p1UpdateScore();
-    p2UpdateScore();
-    startPlayer1Life();
-    if (player2ModeActive === true) {
-      startPlayer2Life();
-    }
-  }
+
 
   const resetButton = document.getElementsByClassName('reset')[0];
   resetButton.addEventListener('click',resetGame);
 
   function resetGame() {
     gameActive = false;
+    createSelectionScreen();
     enemiesInPlay = [];
     player1Record = [];
     player2Record = [];
@@ -1522,9 +1565,18 @@ player2Mode.addEventListener('click',player2Active);
     enemyId = 0;
     player1Lives = 3;
     player2Lives = 3;
+    p1LivesUsed = 0;
+    p2LivesUsed = 0;
+    console.log(levelTimeouts);
+    levelTimeouts.forEach(timeout => clearInterval(timeout));
+    levelTimeouts = [];
+    levelIntervals.forEach(Intervals => clearInterval(Intervals));
+    levelIntervals = [];
+    if (playingField) {
+      playingField.parentNode.removeChild(playingField);
+    }
     //need to clear screen
     //empty the player arrays and enemy arrays(?);
-
   }
 
 

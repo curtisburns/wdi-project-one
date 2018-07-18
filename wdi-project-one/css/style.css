@@ -1,12 +1,17 @@
 body {
   background: lightgrey;
 }
-
 .game {
+  position: relative;
+  margin: auto;
+  /* overflow: hidden; */
+}
+
+.playingField {
   background-color: grey;
   position: relative;
   margin: auto;
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .introScreen {
