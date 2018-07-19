@@ -309,25 +309,16 @@ window.onload = () => {
 
   const p1Score = document.getElementsByClassName('p1-score')[0];
   const p2Score = document.getElementsByClassName('p2-score')[0];
-  let p1ScoreCount;
-  let p2ScoreCount;
-  let p1LivesUsed = 0;
-  let p2LivesUsed = 0;
+
+
+
   let enemiesInPlay = [];
-  const p1BulletsInPlay = [];
-  const p2BulletsInPlay = [];
+
+
   let player1Record = [];
   let player2Record = [];
-  let p1BulletCount = 0; //starts at 1 as this is assigned to the first bullet
-  let p2BulletCount = 0;
-  let enemyId = 0;
   let initialPlayerLives = 3;
-  let player2Lives = 3;
   let defaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
-  let p1ShotPower = 0;
-  let p2DefaultShotPower = 0;
-  let p2ShotPower = 0;
-  let movementIncrement = 2.5; //can use this for powerups, will need to distinguish between p1 and p2 though.
   let gameActive = true;
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
@@ -341,7 +332,8 @@ window.onload = () => {
       lifePoints: 1,
       width: 70,
       height: 25,
-      invincible: true
+      invincible: true,
+      moveSpeed: 2.5
     },
 
     player2: {
@@ -351,7 +343,8 @@ window.onload = () => {
       lifePoints: 1,
       width: 70,
       height: 25,
-      invincible: true
+      invincible: true,
+      moveSpeed: 2.5
     }
   };
 
@@ -587,21 +580,21 @@ window.onload = () => {
 
   function movePlayerRight(player) {
     if(player.xPos < 1000-player.width) {
-      player.xPos+=movementIncrement;
+      player.xPos+=player.moveSpeed;
       player.playerElement.style.left = player.xPos + 'px';
     }
   }
 
   function movePlayerLeft(player) {
     if(player.xPos > 0) {
-      player.xPos-=movementIncrement;
+      player.xPos-=player.moveSpeed;
       player.playerElement.style.left = player.xPos + 'px';
     }
   }
 
   function movePlayerUp(player) {
     if(player.yPos > 0) {
-      player.yPos-=movementIncrement;
+      player.yPos-=player.moveSpeed;
       player.playerElement.style.top = player.yPos + 'px';
 
     }
@@ -609,7 +602,7 @@ window.onload = () => {
 
   function movePlayerDown(player) {
     if(player.yPos < 600-player.height) {
-      player.yPos+=movementIncrement;
+      player.yPos+=player.moveSpeed;
       player.playerElement.style.top = player.yPos + 'px';
     }
   }
@@ -658,6 +651,7 @@ function getCurrentPlayer(playerNumber) {
       this.lives = initialPlayerLives;
       this.charge = 0;
       this.shotPower = defaultShotPower;
+      this.moveSpeed = player.moveSpeed;
       this.initialise();
     }
 
@@ -694,7 +688,6 @@ function getCurrentPlayer(playerNumber) {
           }
           removeInterval(hit);
           if(_this.lives > 1) {
-            console.log('Creating new player');
             createPlayer(_this.class);
           } else {
             _this.gameOver();
@@ -797,7 +790,6 @@ function getCurrentPlayer(playerNumber) {
     }
 
     removeFromGame() {
-      console.log('Remove bullet from game');
       //a check for if the element has been deleted for any reason before this function could do it.
       const domBullet = this.bulletElement;
       if(domBullet.parentNode) {
@@ -831,12 +823,16 @@ function getCurrentPlayer(playerNumber) {
     }
 
     handleEnemyHit(enemy) {
-      const initialEnemyLifePoints = enemy.lifePoints;
-      enemy.lifePoints -= this.hitPoints;
-      this.hitPoints -= initialEnemyLifePoints;
-      if (enemy.lifePoints <= 0) {
-        this.player.score += enemy.score;
-        updateScore(this.player);
+      if(enemy) {
+        const initialEnemyLifePoints = enemy.lifePoints;
+        enemy.lifePoints -= this.hitPoints;
+        this.hitPoints -= initialEnemyLifePoints;
+        console.log(initialEnemyLifePoints);
+        console.log(this.hitPoints);
+        if (enemy.lifePoints <= 0) {
+          this.player.score += enemy.score;
+          updateScore(this.player);
+        }
       }
     }
   }
@@ -854,7 +850,6 @@ function getCurrentPlayer(playerNumber) {
 
   //////////////////////////////enemy creation//////////////////////////////////
 
-  let detect;
 
   function createEnemiesOfClass(enemyClass, numberOfEnemies, delay) {
     levelTimeouts.push(setTimeout(function() {
@@ -865,7 +860,7 @@ function getCurrentPlayer(playerNumber) {
             removeInterval(releaseEnemy);
           } else if(i > 0) {
             i-=1;
-            const spawnedEnemy = new Enemy(enemyClass, enemyId);
+            const spawnedEnemy = new Enemy(enemyClass);
             enemiesInPlay.push(spawnedEnemy);
           } else {
             removeInterval(releaseEnemy);
@@ -878,12 +873,11 @@ function getCurrentPlayer(playerNumber) {
   }
 
   class Enemy {
-    constructor(enemyClass, id) {
+    constructor(enemyClass) {
       const enemy = enemyTypes[enemyClass];
       this.class = enemyClass;
       this.xPos = enemy.x;
       this.yPos = enemy.y;
-      this.id = id;
       this.lifePoints = enemy.lifePoints;
       this.score = enemy.score;
       this.width = enemy.width;
@@ -913,7 +907,6 @@ function getCurrentPlayer(playerNumber) {
     }
 
     initialise() {
-      enemyId +=1;
       this.drone = document.createElement('div');
       this.drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
       this.drone.setAttribute('class', this.class);
@@ -923,13 +916,7 @@ function getCurrentPlayer(playerNumber) {
 
     //***************//player1 collision//******************///
     //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
-    playerCollision(_this,player,xMin,xMax,yMin,yMax) {
-      if(player) {
-        if(player.xPos <= xMax && player.xPos + player.width >= xMin
-          && player.yPos <= yMax && player.yPos + player.height >= yMin && player.invincible === false){
-        }
-      }
-    }
+
 
     isDead() {
       if(this.lifePoints <= 0) {
@@ -950,18 +937,16 @@ function getCurrentPlayer(playerNumber) {
       const _this = this;
       this.intervalId = newInterval(function() {
         const positionWasUpdated = _this.positionFunction();
-        _this.playerCollision();
         _this.isDead();
         if (!positionWasUpdated) {
           if(playingField.children.length > 0) {
             // Remove from enemiesInPlay
-            console.log(enemiesInPlay);
             enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
             _this.removeDOMElement();
             removeInterval(this.intervalId);
           }
         }
-      },50);
+      },5); //has to be the same as the bullet check rate otherwise charge bullets will not work.
       levelIntervals.push(this.intervalId); //rate at which enemies move
     }
 
@@ -973,12 +958,12 @@ function getCurrentPlayer(playerNumber) {
     updatePosition1() {
       //starting xPos is 1000
       if(this.xPos > 412.5) {
-        this.xPos -= 5;
-        this.yPos += 5;
+        this.xPos -= 0.5;
+        this.yPos += 0.5;
         this.positionDOMElement();
       } else if (this.xPos > -50) {
-        this.xPos -= 5;
-        this.yPos -= 5;
+        this.xPos -= 0.5;
+        this.yPos -= 0.5;
         this.positionDOMElement();
       } else {
         return false;
@@ -989,12 +974,12 @@ function getCurrentPlayer(playerNumber) {
     updatePosition2() {
       //starting xPos is 1000
       if(this.xPos > 412.5) {
-        this.xPos -= 5;
-        this.yPos -= 5;
+        this.xPos -= 0.5;
+        this.yPos -= 0.5;
         this.positionDOMElement();
       } else if (this.xPos > -50) {
-        this.xPos -= 5;
-        this.yPos += 5;
+        this.xPos -= 0.5;
+        this.yPos += 0.5;
         this.positionDOMElement();
       } else {
         return false;
@@ -1005,7 +990,7 @@ function getCurrentPlayer(playerNumber) {
     updatePosition3() {
       //starting xPos is 1000
       if (this.xPos > -50) {
-        this.xPos -= 5;
+        this.xPos -= 0.5;
         this.positionDOMElement();
       } else {
         return false;
@@ -1016,12 +1001,12 @@ function getCurrentPlayer(playerNumber) {
     updatePosition4() {
       //starting xPos is 1000
       if (this.yPos < 300 - 50) {
-        this.yPos += 10;
-        this.xPos += 1;
+        this.yPos += 0.1;
+        this.xPos += 0.1;
         this.positionDOMElement();
       } else if (this.yPos < 600) {
-        this.yPos += 5;
-        this.xPos -= 1;
+        this.yPos += 0.5;
+        this.xPos -= 0.1;
         this.positionDOMElement();
       } else {
         return false;
@@ -1032,16 +1017,16 @@ function getCurrentPlayer(playerNumber) {
     updatePosition5() {
       //starting xPos is 1000
       if (this.lifePoints > 100 && this.xPos >= 0) {
-        this.xPos -= 2;
+        this.xPos -= 0.2;
         this.positionDOMElement();
       } else if (this.lifePoints > 50 && this.xPos <= 600 && this.xPos >= 0  ) {
-        this.xPos +=5;
+        this.xPos +=0.5;
         this.positionDOMElement();
       } else if (this.lifePoints > 0 && this.xPos >= 0) {
-        this.xPos -=5;
+        this.xPos -=0.5;
         this.positionDOMElement();
       } else if (this.lifePoints > 0 && this.xPos <= 600) {
-        this.xPos +=5;
+        this.xPos +=0.5;
         this.positionDOMElement();
       } else {
         return false;
@@ -1112,12 +1097,11 @@ function getCurrentPlayer(playerNumber) {
     player2Record = [];
     p1BulletCount = 0; //starts at 1 as this is assigned to the first bullet
     p2BulletCount = 0;
-    enemyId = 0;
     initialPlayerLives = 3;
     player2Lives = 3;
     p1LivesUsed = 0;
     p2LivesUsed = 0;
-
+    player2ModeActive = false;
     levelTimeouts.forEach(timeout => clearTimeout(timeout));
     levelTimeouts = [];
     levelIntervals.forEach(interval => removeInterval(interval));
