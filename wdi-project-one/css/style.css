@@ -227,19 +227,19 @@ font-family: 'Monoton', cursive; */
 }
 
 
-.bulletLvl1 {
+.lvl1 {
   background-color: white;
   position: absolute;
 }
-.bulletLvl2 {
+.lvl2 {
   background-color: yellow;
   position: absolute;
 }
-.bulletLvl3 {
+.lvl3 {
   background-color: red;
   position: absolute;
 }
-.bulletLvlMax {
+.lvlMax {
   background-color: blue;
   position: absolute;
 }
