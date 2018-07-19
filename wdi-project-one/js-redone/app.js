@@ -5,6 +5,9 @@ window.onload = () => {
 ///////////NOTES//////////////
 //known issues//
 
+// initial lives keeps being applied to the new player, doesn't go zero
+
+
 //cannot remove from arrays now. filter does not work.
 //need to fix detect interval as I cannot clear it currently
 //player2 bulletdetect not working.
@@ -314,7 +317,8 @@ window.onload = () => {
 
   let enemiesInPlay = [];
 
-
+  let player1Lives = 3;
+  let player2Lives = 3;
   let player1Record = [];
   let player2Record = [];
   let initialPlayerLives = 3;
@@ -648,7 +652,6 @@ function getCurrentPlayer(playerNumber) {
       this.height = player.height;
       this.bulletsInPlay = [];
       this.score = 0;
-      this.lives = initialPlayerLives;
       this.charge = 0;
       this.shotPower = defaultShotPower;
       this.moveSpeed = player.moveSpeed;
@@ -687,13 +690,22 @@ function getCurrentPlayer(playerNumber) {
             _this.playerElement.parentNode.removeChild(_this.playerElement);
           }
           removeInterval(hit);
-          if(_this.lives > 1) {
+          if(_this.checkLives() > 0) {
             createPlayer(_this.class);
           } else {
             _this.gameOver();
           }
         }
       },50);
+    }
+
+    loseLife() {
+      this.class === 'player1'? player1Lives-=1 : player2Lives-=1;
+    }
+
+    checkLives() {
+      const playerLives = this.class === 'player1'? player1Lives : player2Lives;
+      return playerLives;
     }
 
     checkEnemyCollision() {
@@ -714,8 +726,10 @@ function getCurrentPlayer(playerNumber) {
       this.score -= 100;
       if (this.score < 0) this.score = 0;
 
-      this.lives -= 1;
+      this.loseLife();
+      console.log(player1Lives)
       updateScore(this);
+      console.log(this.checkLives());
     }
 
     chargeShot() {
@@ -961,7 +975,7 @@ function getCurrentPlayer(playerNumber) {
         this.xPos -= 0.5;
         this.yPos += 0.5;
         this.positionDOMElement();
-      } else if (this.xPos > -50) {
+      } else if (this.xPos > this.width) {
         this.xPos -= 0.5;
         this.yPos -= 0.5;
         this.positionDOMElement();
@@ -977,7 +991,7 @@ function getCurrentPlayer(playerNumber) {
         this.xPos -= 0.5;
         this.yPos -= 0.5;
         this.positionDOMElement();
-      } else if (this.xPos > -50) {
+      } else if (this.xPos > this.width) {
         this.xPos -= 0.5;
         this.yPos += 0.5;
         this.positionDOMElement();
@@ -989,7 +1003,7 @@ function getCurrentPlayer(playerNumber) {
 
     updatePosition3() {
       //starting xPos is 1000
-      if (this.xPos > -50) {
+      if (this.xPos > this.width) {
         this.xPos -= 0.5;
         this.positionDOMElement();
       } else {
@@ -1000,8 +1014,8 @@ function getCurrentPlayer(playerNumber) {
 
     updatePosition4() {
       //starting xPos is 1000
-      if (this.yPos < 300 - 50) {
-        this.yPos += 0.1;
+      if (this.yPos < 300 - this.width) {
+        this.yPos += 0.5;
         this.xPos += 0.1;
         this.positionDOMElement();
       } else if (this.yPos < 600) {
@@ -1095,12 +1109,9 @@ function getCurrentPlayer(playerNumber) {
     enemiesInPlay = [];
     player1Record = [];
     player2Record = [];
-    p1BulletCount = 0; //starts at 1 as this is assigned to the first bullet
-    p2BulletCount = 0;
     initialPlayerLives = 3;
+    player1Lives = 3;
     player2Lives = 3;
-    p1LivesUsed = 0;
-    p2LivesUsed = 0;
     player2ModeActive = false;
     levelTimeouts.forEach(timeout => clearTimeout(timeout));
     levelTimeouts = [];
