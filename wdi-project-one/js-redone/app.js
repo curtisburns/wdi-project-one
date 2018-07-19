@@ -37,7 +37,10 @@ window.onload = () => {
 //////////////////////////////
   const gameHeight = 600;
   const gameWidth = 1000; //can use this in calculations below - still need to refactor.
-
+  const backgroundMusic = document.getElementsByClassName('background-music')[0];
+  const player1Sound = document.getElementsByClassName('player1sound')[0];
+  const player2Sound = document.getElementsByClassName('player2sound')[0];
+  const enemySound = document.getElementsByClassName('enemysound')[0];
   ///////////creategame////////////
   const body = document.getElementsByTagName('body')[0];
   const game = document.createElement('div');
@@ -99,6 +102,8 @@ window.onload = () => {
       startGameButton.textContent = 'start game';
       startGameButton.addEventListener('click', endIntro);
       function endIntro() {
+        backgroundMusic.setAttribute('src', './sounds/Daft Punk  The Glitch Mob - Tron Legacy Reconfigured.mp3');
+        backgroundMusic.play();
         aHole.classList.add('animate-a-hole');
         createSelectionScreen();
         setTimeout(function() {
@@ -122,6 +127,8 @@ window.onload = () => {
   let selectMode;
   let createStartMissionButton;
   let startMission;
+
+
 
   function createSelectionScreen() {
     playerSelectScreen = document.createElement('div');
@@ -286,7 +293,7 @@ window.onload = () => {
     playerSelectScreen.parentNode.removeChild(playerSelectScreen);
     playingField = document.createElement('div');
     playingField.setAttribute('class','playingField');
-    playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+    playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px; background: url(./images/spacebackground.png) center/cover`);
     game.appendChild(playingField);
     gameActive = true;
     playingField = document.getElementsByClassName('playingField')[0];
@@ -355,38 +362,123 @@ window.onload = () => {
   const fireType = {
     lvl1: {
       hitPoints: 1,
-      width: 40,
-      height: 10,
-      speed: 2.5
+      width: 15,
+      height: 15,
+      speed: 2.5,
+      img: 'images/bulletlvl1.png',
+      imgWidth: 20,
+      imgHeight: 15
     },
     lvl2: {
       hitPoints: 2,
-      width: 40,
-      height: 10,
-      speed: 2.5
+      width: 20,
+      height: 20,
+      speed: 2.5,
+      img: 'images/bulletlvl2.png',
+      imgWidth: 40,
+      imgHeight: 20
     },
     lvl3: {
       hitPoints: 3,
-      width: 40,
-      height: 10,
-      speed: 2.5
+      width: 50,
+      height: 20,
+      speed: 2.5,
+      img: 'images/bulletlvl3.png',
+      imgWidth: 70,
+      imgHeight: 20
     },
     lvlMax: {
       hitPoints: 10,
-      width: 40,
-      height: 10,
-      speed: 5
+      width: 70,
+      height: 20,
+      speed: 5,
+      img: 'images/bulletlvlMax.png',
+      imgWidth: 90,
+      imgHeight: 20
     }
   };
 
   // TODO:Must add more enemy waves and boss
   const enemyTypes = {
-    type1: { x: 1000, y: -37.5, lifePoints: 1, score: 10, width: 50, height: 50},
-    type2: { x: 1000, y: 575, lifePoints: 2, score: 25, width: 50, height: 50 },
-    type3: { x: 1000, y: 100, lifePoints: 1, score: 10, width: 50, height: 50 },
-    type4: { x: 1000, y: 400, lifePoints: 1, score: 10, width: 50, height: 50 },
-    type5: { x: 350, y: -37.5, lifePoints: 1, score: 10, width: 50, height: 50 },
-    type6: { x: 1000, y: 250, lifePoints: 200, score: 1000, width: 50, height: 50 }
+    type1: {
+      x: 1000,
+      y: -37.5,
+      lifePoints: 6,
+      score: 40,
+      width: 100,
+      height: 100,
+      img: 'images/enemy-greenrobot.png',
+      imgWidth: 100,
+      imgHeight: 100
+    },
+    type2: {
+      x: 1000,
+      y: 575,
+      lifePoints: 8,
+      score: 65,
+      width: 100,
+      height: 100,
+      img: 'images/enemy-pinkrobot.png',
+      imgWidth: 100,
+      imgHeight: 100
+    },
+    type3: {
+      x: 1000,
+      y: 100,
+      lifePoints: 1,
+      score: 10,
+      width: 50,
+      height: 50,
+      img: 'images/enemy-redship.png',
+      imgWidth: 50,
+      imgHeight: 50
+    },
+    type4: {
+      x: 1000,
+      y: 400,
+      lifePoints: 1,
+      score: 10,
+      width: 50,
+      height: 50,
+      img: 'images/enemy-redship.png',
+      imgWidth: 50,
+      imgHeight: 50
+    },
+    type5: {
+      x: 1000,
+      y: 250,
+      lifePoints: 3,
+      score: 35,
+      width: 50,
+      height: 50,
+      img: 'images/enemy-purpleship.png',
+      imgWidth: 50,
+      imgHeight: 50
+    },
+    //can't remember what this is.
+    type6: {
+      x: 350,
+      y: -37.5,
+      lifePoints: 1,
+      score: 10,
+      width: 50,
+      height: 50,
+      img: '',
+      imgWidth: 50,
+      imgHeight: 50
+    },
+    //need to finish - boss?
+    type7: {
+      x: 1000,
+      y: 250,
+      lifePoints: 200,
+      score: 1000,
+      width: 50,
+      height: 50,
+      img: '',
+      imgWidth: 50,
+      imgHeight: 50
+    }
   };
   /////////////////////////////////////////////////
 
@@ -638,10 +730,10 @@ window.onload = () => {
 
 
   ///////////////////////Player Creation////////////////////
-function getCurrentPlayer(playerNumber) {
-  const playerRecord = playerNumber === 1 ? player1Record : player2Record;
-  return playerRecord[playerRecord.length - 1];
-}
+  function getCurrentPlayer(playerNumber) {
+    const playerRecord = playerNumber === 1 ? player1Record : player2Record;
+    return playerRecord[playerRecord.length - 1];
+  }
 
   function createPlayer(playerClass) {
     const spawnedPlayer = new Player(playerClass);
@@ -718,6 +810,14 @@ function getCurrentPlayer(playerNumber) {
       return playerLives;
     }
 
+    identifySoundElement() {
+      if(this.class === 'player1') {
+        return player1Sound;
+      } else {
+        return player2Sound;
+      }
+    }
+
     checkEnemyCollision() {
       if (!this.invincible) {
         const enemiesHit = objectCollidesWithAny(this, enemiesInPlay);
@@ -728,6 +828,8 @@ function getCurrentPlayer(playerNumber) {
     }
 
     handleEnemyHit() {
+      this.identifySoundElement().setAttribute('src', 'sounds/enemydestroy.mp3');
+      this.identifySoundElement().play();
       this.lifePoints -= 1;
       this.alive = false;
       //set position to null on death as enemys may continue to fly through and lower the score.
@@ -744,6 +846,9 @@ function getCurrentPlayer(playerNumber) {
     }
 
     chargeShot() {
+      this.identifySoundElement().setAttribute('src', 'sounds/chargesound.mp3');
+      this.identifySoundElement().play();
+      this.identifySoundElement().loop = true;
       this.chargeIntervalId = newInterval(() => {
         if(this.shotPower.toFixed(2) <= 3) {
           this.shotPower +=0.1;
@@ -768,9 +873,12 @@ function getCurrentPlayer(playerNumber) {
     }
 
     shootByFireType(level) {
+      this.identifySoundElement().setAttribute('src', 'sounds/shootlvl1.mp3');
+      this.identifySoundElement().play();
+      this.identifySoundElement().loop = false;
       //sets initial position of fire at position pf player
-      const xPos = this.xPos;
-      const yPos = this.yPos + 15;
+      const xPos = this.xPos + 35;
+      const yPos = this.yPos + 12;
 
       new Bullet(xPos,yPos,level, this);
     }
@@ -799,6 +907,9 @@ function getCurrentPlayer(playerNumber) {
       this.width = bullet.width;
       this.height = bullet.height;
       this.speed = bullet.speed;
+      this.img = bullet.img;
+      this.imgWidth = bullet.imgWidth;
+      this.imgHeight = bullet.imgHeight;
       // Add this bullet to the player's bullet array
       this.player = player;
       this.player.bulletsInPlay.push(this);
@@ -811,6 +922,11 @@ function getCurrentPlayer(playerNumber) {
       this.bulletElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px`);
       this.bulletElement.setAttribute('class', this.class);
       playingField.appendChild(this.bulletElement);
+
+      this.bulletImg = document.createElement('img');
+      this.bulletImg.setAttribute('style',`width: ${this.imgWidth}px; height: ${this.imgHeight}px`);
+      this.bulletImg.setAttribute('src',this.img);
+      this.bulletElement.appendChild(this.bulletImg);
       this.travel();
     }
 
@@ -907,6 +1023,9 @@ function getCurrentPlayer(playerNumber) {
       this.score = enemy.score;
       this.width = enemy.width;
       this.height = enemy.height;
+      this.img = enemy.img;
+      this.imgWidth = enemy.imgWidth,
+      this.imgHeight = enemy.imgHeight;
       this.setUpdatePositionFunction();
       this.initialise();
     }
@@ -931,14 +1050,24 @@ function getCurrentPlayer(playerNumber) {
         case 'type6':
           this.positionFunction = this.updatePosition6;
           break;
+        case 'type7':
+          this.positionFunction = this.updatePosition7;
+          break;
       }
     }
 
     initialise() {
+      console.log(this.img);
+      console.log(this.height+'px');
       this.drone = document.createElement('div');
-      this.drone.setAttribute('style', 'top:' + this.yPos +'px;' + 'left:' + this.xPos +'px;');
+      this.drone.setAttribute('style', `top:${this.yPos}px; left:${this.xPos}px; width:${this.width}px; height:${this.height}px;`);
       this.drone.setAttribute('class', this.class);
       playingField.appendChild(this.drone);
+
+      this.droneImg = document.createElement('img');
+      this.droneImg.setAttribute('style',`width:${this.imgWidth}px; height:${this.imgHeight}px;`);
+      this.droneImg.setAttribute('src', `${this.img}`);
+      this.drone.appendChild(this.droneImg);
       this.travel();
     }
 
@@ -948,6 +1077,9 @@ function getCurrentPlayer(playerNumber) {
 
     isDead() {
       if(this.lifePoints <= 0) {
+        enemySound.setAttribute('src','sounds/enemydestroy.mp3');
+        enemySound.volume = 0.5;
+        enemySound.play();
         enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== this);
         this.removeDOMElement();
       }
@@ -1017,8 +1149,16 @@ function getCurrentPlayer(playerNumber) {
 
     updatePosition3() {
       //starting xPos is 1000
-      if (this.xPos > this.width) {
+      if (this.xPos > 550) {
         this.xPos -= 1;
+        this.positionDOMElement();
+      } else if (this.xPos > 400) {
+        this.xPos -= 1;
+        this.yPos += .3;
+        this.positionDOMElement();
+      } else if (this.xPos > -this.width) {
+        this.xPos -= 1;
+        this.yPos += .5;
         this.positionDOMElement();
       } else {
         return false;
@@ -1028,8 +1168,17 @@ function getCurrentPlayer(playerNumber) {
 
     updatePosition4() {
       //starting xPos is 1000
-      if (this.xPos > this.width) {
+      //starting xPos is 1000
+      if (this.xPos > 550) {
         this.xPos -= 1;
+        this.positionDOMElement();
+      } else if (this.xPos > 400) {
+        this.xPos -= 1;
+        this.yPos -= .3;
+        this.positionDOMElement();
+      } else if (this.xPos > -this.width) {
+        this.xPos -= 1;
+        this.yPos -= .5;
         this.positionDOMElement();
       } else {
         return false;
@@ -1038,6 +1187,26 @@ function getCurrentPlayer(playerNumber) {
     }
 
     updatePosition5() {
+      //starting xPos is 1000
+      //starting xPos is 1000
+      if (this.xPos > 550) {
+        this.xPos -= 1;
+        this.positionDOMElement();
+      } else if (this.xPos > 400) {
+        this.xPos -= 1;
+        this.yPos -= .3;
+        this.positionDOMElement();
+      } else if (this.xPos > -this.width) {
+        this.xPos -= 1;
+        this.yPos -= .5;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition6() {
       //starting xPos is 1000
       if (this.yPos < 300 - this.width) {
         this.yPos += 1;
@@ -1053,7 +1222,7 @@ function getCurrentPlayer(playerNumber) {
       return true;
     }
 
-    updatePosition6() {
+    updatePosition7() {
       //starting xPos is 1000
       if (this.lifePoints > 100 && this.xPos >= 0) {
         this.xPos -= 0.2;
@@ -1089,11 +1258,11 @@ function getCurrentPlayer(playerNumber) {
     createEnemiesOfClass('type4', 8, 5000);
     createEnemiesOfClass('type3', 8, 10000);
     createEnemiesOfClass('type4', 8, 14000);
-    createEnemiesOfClass('type3', 8,18000);
-    createEnemiesOfClass('type2', 14,22000);
-    createEnemiesOfClass('type4', 8,26000);
-    createEnemiesOfClass('type2', 14,30000);
-    createEnemiesOfClass('type1', 8, 35000);
+    createEnemiesOfClass('type3', 8,20000);
+    createEnemiesOfClass('type5', 14,25000);
+    createEnemiesOfClass('type4', 8,30000);
+    createEnemiesOfClass('type6', 14,350000);
+    createEnemiesOfClass('type1', 8, 40000);
     // Delay for each wave
 
     // Wave 2
@@ -1102,10 +1271,10 @@ function getCurrentPlayer(playerNumber) {
       createEnemiesOfClass('type3', 10,8000);
       createEnemiesOfClass('type4', 8,10000);
       createEnemiesOfClass('type1', 14, 15000);
-      createEnemiesOfClass('type3', 8,20000);
+      createEnemiesOfClass('type6', 8,20000);
       createEnemiesOfClass('type2', 14,27000);
       createEnemiesOfClass('type3', 8,35000);
-    }, 40000)); //Delay for each wave
+    }, 45000)); //Delay for each wave
 
   // wave3();
   }
@@ -1146,6 +1315,8 @@ function getCurrentPlayer(playerNumber) {
     levelIntervals = [];
     if (playingField) {
       playingField.parentNode.removeChild(playingField);
+      player1Sound.setAttribute('src','');
+      player2Sound.setAttribute('src','');
     }
     //need to clear screen
     //empty the player arrays and enemy arrays(?);

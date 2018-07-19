@@ -228,53 +228,34 @@ font-family: 'Monoton', cursive; */
 
 
 .lvl1 {
-  background-color: white;
   position: absolute;
 }
 .lvl2 {
-  background-color: yellow;
   position: absolute;
 }
 .lvl3 {
-  background-color: red;
   position: absolute;
 }
 .lvlMax {
-  background-color: blue;
   position: absolute;
 }
 
 .type1 {
   position: absolute;
-  height: 50px;
-  width: 50px;
-  background-color: red;
 }
 
 .type2 {
   position: absolute;
-  height: 50px;
-  width: 50px;
-  background-color: brown;
 }
 
 .type3 {
   position: absolute;
-  height: 50px;
-  width: 50px;
-  background-color: orange;
 }
 
 .type4 {
   position: absolute;
-  height: 50px;
-  width: 50px;
-  background-color: purple;
 }
 
 .type5 {
   position: absolute;
-  height: 300px;
-  width: 300px;
-  background-color: green;
 }
