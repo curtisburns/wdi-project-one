@@ -383,9 +383,10 @@ window.onload = () => {
   const enemyTypes = {
     type1: { x: 1000, y: -37.5, lifePoints: 1, score: 10, width: 50, height: 50},
     type2: { x: 1000, y: 575, lifePoints: 2, score: 25, width: 50, height: 50 },
-    type3: { x: 1000, y: 300, lifePoints: 1, score: 10, width: 50, height: 50 },
-    type4: { x: 350, y: -37.5, lifePoints: 1, score: 10, width: 50, height: 50 },
-    type5: { x: 1000, y: 250, lifePoints: 200, score: 1000, width: 50, height: 50 }
+    type3: { x: 1000, y: 100, lifePoints: 1, score: 10, width: 50, height: 50 },
+    type4: { x: 1000, y: 400, lifePoints: 1, score: 10, width: 50, height: 50 },
+    type5: { x: 350, y: -37.5, lifePoints: 1, score: 10, width: 50, height: 50 },
+    type6: { x: 1000, y: 250, lifePoints: 200, score: 1000, width: 50, height: 50 }
   };
   /////////////////////////////////////////////////
 
@@ -461,10 +462,12 @@ window.onload = () => {
         ArrowDown = true;
         break;
       case 'm':
-        if (p1TriggerPulled === false) {
-          getCurrentPlayer(1).chargeShot();
+        if(getCurrentPlayer(1).alive === true) {
+          if (p1TriggerPulled === false) {
+            getCurrentPlayer(1).chargeShot();
+          }
+          p1TriggerPulled = true;
         }
-        p1TriggerPulled = true;
         break;
       case 'w':
         if (w === false) {
@@ -491,10 +494,12 @@ window.onload = () => {
         d = true;
         break;
       case 'c':
-        if (p2TriggerPulled === false) {
-          getCurrentPlayer(2).chargeShot();
+        if(getCurrentPlayer(2).alive === true) {
+          if (p2TriggerPulled === false) {
+            getCurrentPlayer(2).chargeShot();
+          }
+          p2TriggerPulled = true;
         }
-        p2TriggerPulled = true;
         break;
     }
   });
@@ -519,8 +524,10 @@ window.onload = () => {
         ArrowDown = false;
         break;
       case 'm':
-        getCurrentPlayer(1).fireShot();
-        p1TriggerPulled = false;
+        if(getCurrentPlayer(1).alive === true) {
+          getCurrentPlayer(1).fireShot();
+          p1TriggerPulled = false;
+        }
         break;
       case 'w':
         stopMovement(1, 'up');
@@ -539,8 +546,10 @@ window.onload = () => {
         d = false;
         break;
       case 'c':
-        getCurrentPlayer(2).fireShot();
-        p2TriggerPulled = false;
+        if(getCurrentPlayer(2).alive === true) {
+          getCurrentPlayer(2).fireShot();
+          p2TriggerPulled = false;
+        }
         break;
     }
   });
@@ -655,6 +664,7 @@ function getCurrentPlayer(playerNumber) {
       this.charge = 0;
       this.shotPower = defaultShotPower;
       this.moveSpeed = player.moveSpeed;
+      this.alive = true;
       this.initialise();
     }
 
@@ -719,6 +729,7 @@ function getCurrentPlayer(playerNumber) {
 
     handleEnemyHit() {
       this.lifePoints -= 1;
+      this.alive = false;
       //set position to null on death as enemys may continue to fly through and lower the score.
       this.xPos = null;
       this.yPos = null;
@@ -879,10 +890,10 @@ function getCurrentPlayer(playerNumber) {
           } else {
             removeInterval(releaseEnemy);
           }
-        },700 //********** rate at which type 1 enemies spawn *************//
+        },1000 //reate at which enemies spawn
         );
       }
-    },delay //************** delay for when type 2 initiates *****************//
+    },delay
     ));
   }
 
@@ -916,6 +927,9 @@ function getCurrentPlayer(playerNumber) {
           break;
         case 'type5':
           this.positionFunction = this.updatePosition5;
+          break;
+        case 'type6':
+          this.positionFunction = this.updatePosition6;
           break;
       }
     }
@@ -972,12 +986,12 @@ function getCurrentPlayer(playerNumber) {
     updatePosition1() {
       //starting xPos is 1000
       if(this.xPos > 412.5) {
-        this.xPos -= 0.5;
-        this.yPos += 0.5;
+        this.xPos -= 1;
+        this.yPos += 1;
         this.positionDOMElement();
       } else if (this.xPos > this.width) {
-        this.xPos -= 0.5;
-        this.yPos -= 0.5;
+        this.xPos -= 1;
+        this.yPos -= 1;
         this.positionDOMElement();
       } else {
         return false;
@@ -988,12 +1002,12 @@ function getCurrentPlayer(playerNumber) {
     updatePosition2() {
       //starting xPos is 1000
       if(this.xPos > 412.5) {
-        this.xPos -= 0.5;
-        this.yPos -= 0.5;
+        this.xPos -= 1;
+        this.yPos -= 1;
         this.positionDOMElement();
       } else if (this.xPos > this.width) {
-        this.xPos -= 0.5;
-        this.yPos += 0.5;
+        this.xPos -= 1;
+        this.yPos += 1;
         this.positionDOMElement();
       } else {
         return false;
@@ -1004,7 +1018,7 @@ function getCurrentPlayer(playerNumber) {
     updatePosition3() {
       //starting xPos is 1000
       if (this.xPos > this.width) {
-        this.xPos -= 0.5;
+        this.xPos -= 1;
         this.positionDOMElement();
       } else {
         return false;
@@ -1014,13 +1028,8 @@ function getCurrentPlayer(playerNumber) {
 
     updatePosition4() {
       //starting xPos is 1000
-      if (this.yPos < 300 - this.width) {
-        this.yPos += 0.5;
-        this.xPos += 0.1;
-        this.positionDOMElement();
-      } else if (this.yPos < 600) {
-        this.yPos += 0.5;
-        this.xPos -= 0.1;
+      if (this.xPos > this.width) {
+        this.xPos -= 1;
         this.positionDOMElement();
       } else {
         return false;
@@ -1029,6 +1038,22 @@ function getCurrentPlayer(playerNumber) {
     }
 
     updatePosition5() {
+      //starting xPos is 1000
+      if (this.yPos < 300 - this.width) {
+        this.yPos += 1;
+        this.xPos += 0.2;
+        this.positionDOMElement();
+      } else if (this.yPos < 600) {
+        this.yPos += 1;
+        this.xPos -= 0.2;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition6() {
       //starting xPos is 1000
       if (this.lifePoints > 100 && this.xPos >= 0) {
         this.xPos -= 0.2;
@@ -1060,12 +1085,14 @@ function getCurrentPlayer(playerNumber) {
 
     // Wave 1
     // type5(1,0);
-    createEnemiesOfClass('type1', 8, 0);
-    createEnemiesOfClass('type2', 10,8000);
-    createEnemiesOfClass('type3', 8,10000);
-    createEnemiesOfClass('type2', 14,15000);
-    createEnemiesOfClass('type4', 8,20000);
-    createEnemiesOfClass('type2', 14,27000);
+    createEnemiesOfClass('type3', 8, 0);
+    createEnemiesOfClass('type4', 8, 5000);
+    createEnemiesOfClass('type3', 8, 10000);
+    createEnemiesOfClass('type4', 8, 14000);
+    createEnemiesOfClass('type3', 8,18000);
+    createEnemiesOfClass('type2', 14,22000);
+    createEnemiesOfClass('type4', 8,26000);
+    createEnemiesOfClass('type2', 14,30000);
     createEnemiesOfClass('type1', 8, 35000);
     // Delay for each wave
 
