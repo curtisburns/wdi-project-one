@@ -1,5 +1,5 @@
 body {
-  background: black;
+  background: url('../images/arcadebackground.png') center/cover repeat;
   position: relative;
 
 }
@@ -240,7 +240,7 @@ font-family: 'Monoton', cursive; */
   border-radius: 50%;
   transition: all 2s;
   animation: animateAHole 0.5s backwards 4.5s;
-  z-index: 999;
+  z-index: 1000;
 }
 @keyframes animateAHole {
   0% {

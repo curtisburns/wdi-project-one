@@ -121,8 +121,8 @@ window.onload = () => {
           introScreen.parentNode.removeChild(introScreen);
         },1000);
       }
-    }, 0); //2500
-  }, 0); //4500
+    }, 2500); //2500
+  }, 4500); //4500
   /////////////////////////////////////////////////
   ////////////player selection/startgame///////////////
   let player2ModeActive = false; //will be included in intro so player can select.
@@ -746,40 +746,40 @@ window.onload = () => {
           p1TriggerPulled = true;
         }
         break;
-        case 'ArrowLeft':
-          if (ArrowLeft === false) {
-            startMovement(1, 'left');
+      case 'ArrowLeft':
+        if (ArrowLeft === false) {
+          startMovement(1, 'left');
+        }
+        ArrowLeft = true;
+        break;
+      case 'ArrowRight':
+        if (ArrowRight === false) {
+          startMovement(1, 'right');
+        }
+        ArrowRight = true;
+        break;
+      case 'ArrowUp':
+        if (ArrowUp === false) {
+          startMovement(1, 'up');
+        }
+        ArrowUp = true;
+        break;
+      case 'ArrowDown':
+        if (ArrowDown === false) {
+          startMovement(1, 'down');
+        }
+        ArrowDown = true;
+        break;
+      case 'm':
+        if(getCurrentPlayer(2).alive === true) {
+          if (p2TriggerPulled === false) {
+            getCurrentPlayer(2).chargeShot();
           }
-          ArrowLeft = true;
-          break;
-        case 'ArrowRight':
-          if (ArrowRight === false) {
-            startMovement(1, 'right');
-          }
-          ArrowRight = true;
-          break;
-        case 'ArrowUp':
-          if (ArrowUp === false) {
-            startMovement(1, 'up');
-          }
-          ArrowUp = true;
-          break;
-        case 'ArrowDown':
-          if (ArrowDown === false) {
-            startMovement(1, 'down');
-          }
-          ArrowDown = true;
-          break;
-        case 'm':
-          if(getCurrentPlayer(2).alive === true) {
-            if (p2TriggerPulled === false) {
-              getCurrentPlayer(2).chargeShot();
-            }
-            p2TriggerPulled = true;
-          }
-          break;
-    }
-  });
+          p2TriggerPulled = true;
+        }
+        break;
+      }
+    });
 
 
   window.addEventListener('keyup', e => {
@@ -1512,7 +1512,7 @@ window.onload = () => {
       if(!gameOverScreen) {
         gameOver('You survived the battle! Great work!');
       }
-    }, 100000));
+    }, 110000));
 
   // wave3();
   }
