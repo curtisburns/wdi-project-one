@@ -427,7 +427,7 @@ window.onload = () => {
       p1ChargeBarContainer.parentNode.removeChild(p1ChargeBarContainer);
     }
     if(p2ChargeBarContainer) {
-      p1ChargeBarContainer.parentNode.removeChild(p1ChargeBarContainer);
+      p2ChargeBarContainer.parentNode.removeChild(p2ChargeBarContainer);
     }
   }
 
@@ -921,8 +921,15 @@ window.onload = () => {
     return playerRecord[playerRecord.length - 1];
   }
 
-  function createPlayer(playerClass) {
+  // Create a player object. Optionally, pass the previous player
+  // (after the previous player has died) so the score can be maintained
+  // between lives
+  function createPlayer(playerClass, previousPlayer) {
     const spawnedPlayer = new Player(playerClass);
+    if (previousPlayer) {
+      // Maintain score between lives
+      spawnedPlayer.score = previousPlayer.score;
+    }
     const playerRecord = playerClass === 'player1'? player1Record : player2Record;
     playerRecord.push(spawnedPlayer);
   }
@@ -979,7 +986,7 @@ window.onload = () => {
           }
           removeInterval(hit);
           if(_this.checkLives() > 0) {
-            createPlayer(_this.class);
+            createPlayer(_this.class, _this);
           } else {
             gameOver('Game over');
           }
