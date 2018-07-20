@@ -24,6 +24,29 @@ body {
   overflow: hidden;
 }
 
+.planet1 {
+  position: absolute;
+  width: 120px;
+  height: 100px;
+  right: -120px;
+  top: 360px;
+  animation: planetMovement 120s linear forwards;
+}
+.planet2 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  right: 100px;
+  top: 100px;
+  animation: planetMovement 180s linear forwards;
+}
+
+@keyframes planetMovement {
+  100% {
+    right: 1600px;
+  }
+}
+
 .reset {
   cursor: pointer;
   color: white;

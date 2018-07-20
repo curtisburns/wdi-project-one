@@ -337,6 +337,8 @@ window.onload = () => {
   let p2ChargeBarFill;
   let p1ChargeBarElement;
   let p2ChargeBarElement;
+  let planet1;
+  let planet2;
 
   function startGame() {
     playerSelectScreen.parentNode.removeChild(playerSelectScreen);
@@ -353,7 +355,16 @@ window.onload = () => {
     insertChargeBars();
     gameActive = true;
     playingField = document.getElementsByClassName('playingField')[0];
+    planet1 = document.createElement('img');
+    planet1.setAttribute('class','planet1');
+    planet1.setAttribute('src', './images/planet1.png');
+    playingField.appendChild(planet1);
 
+
+    planet2 = document.createElement('img');
+    planet2.setAttribute('class','planet2');
+    planet2.setAttribute('src', './images/planet2.png');
+    playingField.appendChild(planet2);
 
     setTimeout(startWaves, 1000);
     createPlayer('player1');
