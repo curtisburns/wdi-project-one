@@ -5,6 +5,8 @@ window.onload = () => {
 ///////////NOTES//////////////
 //known issues//
 
+//at the moment, as score is tied to player object, you will lose all points on death, need to detach from object or find a way to store score from previous life.
+
 // initial lives keeps being applied to the new player, doesn't go zero
 
 
@@ -47,6 +49,12 @@ window.onload = () => {
   game.setAttribute('class','game');
   game.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
   body.appendChild(game);
+
+  const arcadeImg = document.createElement('img');
+  arcadeImg.setAttribute('class','arcade-machine');
+  arcadeImg.setAttribute('style', 'width:1365px; height:1290px;');
+  arcadeImg.setAttribute('src', 'images/arcade.png');
+  game.appendChild(arcadeImg);
   /////////////////////////////////////////
 
   //////////createIntro/////////
@@ -102,11 +110,14 @@ window.onload = () => {
       startGameButton.textContent = 'start game';
       startGameButton.addEventListener('click', endIntro);
       function endIntro() {
+        startGameButton.removeEventListener('click', endIntro);
         backgroundMusic.setAttribute('src', './sounds/Daft Punk  The Glitch Mob - Tron Legacy Reconfigured.mp3');
         backgroundMusic.play();
+        backgroundMusic.loop = true;
         aHole.classList.add('animate-a-hole');
-        createSelectionScreen();
         setTimeout(function() {
+          startGameButton.addEventListener('click', endIntro);
+          createSelectionScreen();
           introScreen.parentNode.removeChild(introScreen);
         },1000);
       }
@@ -127,6 +138,7 @@ window.onload = () => {
   let selectMode;
   let createStartMissionButton;
   let startMission;
+  let player1Instructions;
 
 
 
@@ -151,17 +163,24 @@ window.onload = () => {
     player1Character.appendChild(char1Image);
     playerSelectScreen.appendChild(player1Character);
 
+    player1Instructions = document.createElement('div');
+    player1Instructions.setAttribute('class','player1Instructions');
+    player1Instructions.setAttribute('style', 'width: 300px; height: 100px;');
+    player1Instructions.innerHTML = '<p>WASD keys to move</p> <p>c to shoot/hold to charge shot</p>';
+    playerSelectScreen.appendChild(player1Instructions);
+
     player1SelectLeft = document.createElement('div');
-    player1SelectLeft .setAttribute('class','player1SelectLeft');
-    player1SelectLeft .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-100}px; background:   url(images/arrowleft.png) center/160%`);
+    player1SelectLeft.setAttribute('class','player1SelectLeft');
+    player1SelectLeft.setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-100}px; background:   url(images/arrowleft.png) center/160%`);
     playerSelectScreen.appendChild(player1SelectLeft );
 
     player1SelectLeft.addEventListener('click', p1CycleLeft);
 
     player1SelectRight = document.createElement('div');
-    player1SelectRight .setAttribute('class','player1SelectRight');
-    player1SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
+    player1SelectRight.setAttribute('class','player1SelectRight');
+    player1SelectRight.setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
     playerSelectScreen.appendChild(player1SelectRight );
+
 
     player1SelectRight.addEventListener('click', p1CycleRight);
 
@@ -224,6 +243,7 @@ window.onload = () => {
   let player2SelectLeft;
   let player2SelectRight;
   let player2Heading;
+  let player2Instructions;
 
   function showPlayer2Options() {
     player2Mode .textContent = '2 Players';
@@ -241,6 +261,12 @@ window.onload = () => {
     char2Image.setAttribute('src', `images/ship${player2Color}.png`);
     char2Image.setAttribute('style', 'width: 160px; height: 55px');
     player2Character.appendChild(char2Image);
+
+    player2Instructions = document.createElement('div');
+    player2Instructions.setAttribute('class','player2Instructions');
+    player2Instructions.setAttribute('style', 'width: 300px; height: 100px;');
+    player2Instructions.innerHTML = '<p>Arrow keys to move</p> <p>m to shoot/hold to charge shot</p>';
+    playerSelectScreen.appendChild(player2Instructions);
 
 
     player2SelectLeft = document.createElement('div');
@@ -288,6 +314,29 @@ window.onload = () => {
   ///createplayingField////////////
 
   let playingField;
+  let scorePanel1;
+  let scorePanel2;
+  let livesPanel1;
+  let livesPanel2;
+  let p1Score;
+  let p2Score;
+  let p1Lives;
+  let p2Lives;
+  let resetButton;
+  let gameOverScreen;
+  let initialPlayerLives = 3;
+  let player1Lives = initialPlayerLives;
+  let player2Lives = initialPlayerLives;
+  let player1Record = [];
+  let player2Record = [];
+  let p1ChargeBarStat;
+  let p2ChargeBarStat;
+  let p1ChargeBarContainer;
+  let p2ChargeBarContainer;
+  let p1ChargeBarFill;
+  let p2ChargeBarFill;
+  let p1ChargeBarElement;
+  let p2ChargeBarElement;
 
   function startGame() {
     playerSelectScreen.parentNode.removeChild(playerSelectScreen);
@@ -295,17 +344,18 @@ window.onload = () => {
     playingField.setAttribute('class','playingField');
     playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px; background: url(./images/spacebackground.png) center/cover`);
     game.appendChild(playingField);
+    removeScorePanels();
+    insertScorePanels();
+    insertResetButton();
+    removeLifePanels();
+    insertLifePanels();
+    removeChargeBars();
+    insertChargeBars();
     gameActive = true;
     playingField = document.getElementsByClassName('playingField')[0];
-    if(!playingField) {
-      playingField = document.createElement('div');
-      game.setAttribute('class','playingField');
-      game.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
-      game.appendChild(playingField);
-    }
+
+
     setTimeout(startWaves, 1000);
-    p1ScoreCount = 0;
-    p2ScoreCount = 0;
     createPlayer('player1');
     updateScore(getCurrentPlayer(1));
     if (player2ModeActive === true) {
@@ -314,21 +364,144 @@ window.onload = () => {
     }
   }
 
+  function insertScorePanels() {
+    scorePanel1 = document.createElement('div');
+    scorePanel1.setAttribute('class', 'score-panel1');
+    scorePanel1.setAttribute('style', 'top: 10px; left: 30px');
+    scorePanel1.innerHTML = '<p class="p1-score-text">player 1 score: <span class="p1-score"></span></p>';
+    game.appendChild(scorePanel1);
+    p1Score = document.getElementsByClassName('p1-score')[0];
+
+    scorePanel2 = document.createElement('div');
+    scorePanel2.setAttribute('class', 'score-panel2');
+    scorePanel2.setAttribute('style', 'top: 10px; right: 30px');
+    scorePanel2.innerHTML = '<p class="p1-score-text">player 2 score: <span class="p2-score"></span></p>';
+    game.appendChild(scorePanel2);
+    p2Score = document.getElementsByClassName('p2-score')[0];
+  }
+
+  function removeScorePanels() {
+    if(scorePanel1 && scorePanel2) {
+      scorePanel1.parentNode.removeChild(scorePanel1);
+      scorePanel2.parentNode.removeChild(scorePanel2);
+    }
+  }
+
+  function insertResetButton() {
+    resetButton = document.createElement('div');
+    resetButton.setAttribute('class', 'reset');
+    resetButton.setAttribute('style', 'bottom: 10px; right: 30px');
+    playingField.appendChild(resetButton);
+    resetButton.addEventListener('click',resetGame);
+    resetButton.textContent = 'reset';
+  }
+
+  function insertChargeBars() {
+    p1ChargeBarContainer = document.createElement('div');
+    p1ChargeBarContainer.setAttribute('class', 'chargeBarContainer');
+    p1ChargeBarContainer.setAttribute('style', 'top: 43px; left: 155px');
+    playingField.appendChild(p1ChargeBarContainer);
+
+    p1ChargeBarFill = document.createElement('div');
+    p1ChargeBarFill.setAttribute('class', 'p1ChargeBar');
+    p1ChargeBarContainer.appendChild(p1ChargeBarFill);
+
+    p1ChargeBarElement = document.getElementsByClassName('p1ChargeBar')[0];
+    if (player2ModeActive) {
+      p2ChargeBarContainer = document.createElement('div');
+      p2ChargeBarContainer.setAttribute('class', 'chargeBarContainer');
+      p2ChargeBarContainer.setAttribute('style', 'top: 43px; right: 43px');
+      playingField.appendChild(p2ChargeBarContainer);
+
+      p2ChargeBarFill = document.createElement('div');
+      p2ChargeBarFill.setAttribute('class', 'p2ChargeBar');
+      p2ChargeBarContainer.appendChild(p2ChargeBarFill);
+
+      p2ChargeBarElement = document.getElementsByClassName('p2ChargeBar')[0];
+      console.log(p1ChargeBarElement);
+    }
+  }
+
+  function removeChargeBars() {
+    if(p1ChargeBarContainer) {
+      p1ChargeBarContainer.parentNode.removeChild(p1ChargeBarContainer);
+    }
+    if(p2ChargeBarContainer) {
+      p1ChargeBarContainer.parentNode.removeChild(p1ChargeBarContainer);
+    }
+  }
+
+
+  function createGameOverScreen(phrase) {
+    gameOverScreen = document.createElement('div');
+    gameOverScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+    gameOverScreen.setAttribute('class', 'gameover');
+    gameOverScreen.innerHTML = `<p class="gameover-text">${phrase}</p>`;
+    game.appendChild(gameOverScreen);
+
+  //   score
+  //
+  //   const whoWins = document.createElement('div');
+  //   whoWins.setAttribute('style', 'width: 300px; height: 100px;');
+  //   whoWins.setAttribute('class', 'whoWins');
+  //   whoWins.innerHTML = `<p>Player ${highestScorer} wins!</p><p>Score: ${highestScore}>`;
+  //   gameOverScreen.appendChild(whoWins);
+  //
+  }
+
+
+
+  function insertLifePanels() {
+    livesPanel1 = document.createElement('div');
+    livesPanel1.setAttribute('class', 'lives-panel1');
+    livesPanel1.setAttribute('style', 'top: 30px; left: 28px');
+    livesPanel1.innerHTML = `<p class="p1-lives-text">Lives: <span class="p1-lives">${player1Lives}</span></p>`;
+    game.appendChild(livesPanel1);
+    p1Lives = document.getElementsByClassName('p1-lives')[0];
+
+
+    if (player2ModeActive) {
+      livesPanel2 = document.createElement('div');
+      livesPanel2.setAttribute('class', 'lives-panel2');
+      livesPanel2.setAttribute('style', 'top: 30px; right: 240px');
+      livesPanel2.innerHTML = `<p class="p2-lives-text">Lives: <span class="p2-lives">${player2Lives}</span></p>`;
+      game.appendChild(livesPanel2);
+      p2Lives = document.getElementsByClassName('p2-lives')[0];
+
+    }
+  }
+
+
+
+  function removeLifePanels() {
+    if(livesPanel1) {
+      livesPanel1.parentNode.removeChild(livesPanel1);
+    }
+    if(livesPanel2) {
+      livesPanel2.parentNode.removeChild(livesPanel2);
+    }
+  }
+
+  function updateLifePanels(player) {
+    if (player.class === 'player1') {
+
+      p1Lives.textContent = player1Lives;
+    } else p2Lives.textContent = player2Lives;
+  }
+
+
+
+
   //   ////////////////Declarations///////////////////////
 
 
-  const p1Score = document.getElementsByClassName('p1-score')[0];
-  const p2Score = document.getElementsByClassName('p2-score')[0];
+
 
 
 
   let enemiesInPlay = [];
 
-  let player1Lives = 3;
-  let player2Lives = 3;
-  let player1Record = [];
-  let player2Record = [];
-  let initialPlayerLives = 3;
+
   let defaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
   let gameActive = true;
   //These is declared as let as they are rassigned when they have been removed from DOM
@@ -337,7 +510,7 @@ window.onload = () => {
 
   const players = {
     player1: {
-      x: 0,
+      x: 10,
       y: 250,
       kills: 0,
       lifePoints: 1,
@@ -348,7 +521,7 @@ window.onload = () => {
     },
 
     player2: {
-      x: 0,
+      x: 10,
       y: 280,
       kills: 0,
       lifePoints: 1,
@@ -404,7 +577,7 @@ window.onload = () => {
       x: 1000,
       y: -37.5,
       lifePoints: 6,
-      score: 40,
+      score: 100,
       width: 100,
       height: 100,
       img: 'images/enemy-greenrobot.png',
@@ -414,8 +587,8 @@ window.onload = () => {
     type2: {
       x: 1000,
       y: 575,
-      lifePoints: 8,
-      score: 65,
+      lifePoints: 10,
+      score: 400,
       width: 100,
       height: 100,
       img: 'images/enemy-pinkrobot.png',
@@ -448,6 +621,18 @@ window.onload = () => {
       x: 1000,
       y: 250,
       lifePoints: 3,
+      score: 50,
+      width: 50,
+      height: 50,
+      img: 'images/enemy-purpleship.png',
+      imgWidth: 50,
+      imgHeight: 50
+    },
+
+    type6: {
+      x: 1000,
+      y: 250,
+      lifePoints: 3,
       score: 35,
       width: 50,
       height: 50,
@@ -455,20 +640,20 @@ window.onload = () => {
       imgWidth: 50,
       imgHeight: 50
     },
-    //can't remember what this is.
-    type6: {
+
+    type7: {
       x: 350,
       y: -37.5,
       lifePoints: 1,
       score: 10,
       width: 50,
       height: 50,
-      img: '',
+      img: 'images/enemy-brownship.png',
       imgWidth: 50,
       imgHeight: 50
     },
     //need to finish - boss?
-    type7: {
+    type8: {
       x: 1000,
       y: 250,
       lifePoints: 200,
@@ -529,31 +714,31 @@ window.onload = () => {
 
 
     switch(e.key) {
-      case 'ArrowLeft':
-        if (ArrowLeft === false) {
-          startMovement(0, 'left');
-        }
-        ArrowLeft = true;
-        break;
-      case 'ArrowRight':
-        if (ArrowRight === false) {
-          startMovement(0, 'right');
-        }
-        ArrowRight = true;
-        break;
-      case 'ArrowUp':
-        if (ArrowUp === false) {
+      case 'w':
+        if (w === false) {
           startMovement(0, 'up');
         }
-        ArrowUp = true;
+        w = true;
         break;
-      case 'ArrowDown':
-        if (ArrowDown === false) {
+      case 'a':
+        if (a === false) {
+          startMovement(0, 'left');
+        }
+        a = true;
+        break;
+      case 's':
+        if (s === false) {
           startMovement(0, 'down');
         }
-        ArrowDown = true;
+        s = true;
         break;
-      case 'm':
+      case 'd':
+        if (d === false) {
+          startMovement(0, 'right');
+        }
+        d = true;
+        break;
+      case 'c':
         if(getCurrentPlayer(1).alive === true) {
           if (p1TriggerPulled === false) {
             getCurrentPlayer(1).chargeShot();
@@ -561,88 +746,89 @@ window.onload = () => {
           p1TriggerPulled = true;
         }
         break;
-      case 'w':
-        if (w === false) {
-          startMovement(1, 'up');
-        }
-        w = true;
-        break;
-      case 'a':
-        if (a === false) {
-          startMovement(1, 'left');
-        }
-        a = true;
-        break;
-      case 's':
-        if (s === false) {
-          startMovement(1, 'down');
-        }
-        s = true;
-        break;
-      case 'd':
-        if (d === false) {
-          startMovement(1, 'right');
-        }
-        d = true;
-        break;
-      case 'c':
-        if(getCurrentPlayer(2).alive === true) {
-          if (p2TriggerPulled === false) {
-            getCurrentPlayer(2).chargeShot();
+        case 'ArrowLeft':
+          if (ArrowLeft === false) {
+            startMovement(1, 'left');
           }
-          p2TriggerPulled = true;
-        }
-        break;
+          ArrowLeft = true;
+          break;
+        case 'ArrowRight':
+          if (ArrowRight === false) {
+            startMovement(1, 'right');
+          }
+          ArrowRight = true;
+          break;
+        case 'ArrowUp':
+          if (ArrowUp === false) {
+            startMovement(1, 'up');
+          }
+          ArrowUp = true;
+          break;
+        case 'ArrowDown':
+          if (ArrowDown === false) {
+            startMovement(1, 'down');
+          }
+          ArrowDown = true;
+          break;
+        case 'm':
+          if(getCurrentPlayer(2).alive === true) {
+            if (p2TriggerPulled === false) {
+              getCurrentPlayer(2).chargeShot();
+            }
+            p2TriggerPulled = true;
+          }
+          break;
     }
   });
 
 
   window.addEventListener('keyup', e => {
     switch(e.key) {
-      case 'ArrowLeft':
-        stopMovement(0, 'left');
-        ArrowLeft = false;
-        break;
-      case 'ArrowRight':
-        stopMovement(0, 'right');
-        ArrowRight = false;
-        break;
-      case 'ArrowUp':
+      case 'w':
         stopMovement(0, 'up');
-        ArrowUp = false;
+        w = false;
         break;
-      case 'ArrowDown':
+      case 'a':
+        stopMovement(0, 'left');
+        a = false;
+        break;
+      case 's':
         stopMovement(0, 'down');
-        ArrowDown = false;
+        s = false;
         break;
-      case 'm':
+      case 'd':
+        stopMovement(0, 'right');
+        d = false;
+        break;
+      case 'c':
         if(getCurrentPlayer(1).alive === true) {
           getCurrentPlayer(1).fireShot();
           p1TriggerPulled = false;
         }
         break;
-      case 'w':
-        stopMovement(1, 'up');
-        w = false;
-        break;
-      case 'a':
+      case 'ArrowLeft':
         stopMovement(1, 'left');
-        a = false;
+        ArrowLeft = false;
         break;
-      case 's':
-        stopMovement(1, 'down');
-        s = false;
-        break;
-      case 'd':
+      case 'ArrowRight':
         stopMovement(1, 'right');
-        d = false;
+        ArrowRight = false;
         break;
-      case 'c':
+      case 'ArrowUp':
+        stopMovement(1, 'up');
+        ArrowUp = false;
+        break;
+      case 'ArrowDown':
+        stopMovement(1, 'down');
+        ArrowDown = false;
+        break;
+      case 'm':
         if(getCurrentPlayer(2).alive === true) {
           getCurrentPlayer(2).fireShot();
           p2TriggerPulled = false;
         }
         break;
+
     }
   });
 
@@ -795,10 +981,10 @@ window.onload = () => {
           if(_this.checkLives() > 0) {
             createPlayer(_this.class);
           } else {
-            _this.gameOver();
+            gameOver('Game over');
           }
         }
-      },50);
+      },5);
     }
 
     loseLife() {
@@ -838,18 +1024,27 @@ window.onload = () => {
 
       this.score -= 100;
       if (this.score < 0) this.score = 0;
-
       this.loseLife();
-      console.log(player1Lives)
       updateScore(this);
-      console.log(this.checkLives());
+      updateLifePanels(this);
+      removeInterval(this.chargeIntervalId);
     }
 
     chargeShot() {
       this.identifySoundElement().setAttribute('src', 'sounds/chargesound.mp3');
       this.identifySoundElement().play();
       this.identifySoundElement().loop = true;
+      this.identifySoundElement().volume = 0.5;
       this.chargeIntervalId = newInterval(() => {
+        if (this.class === 'player1') {
+          console.log(p1ChargeBarStat);
+          p1ChargeBarStat = this.shotPower.toFixed(2);
+          calcChargeBarWidth(this.class);
+        } else {
+          p2ChargeBarStat = this.shotPower.toFixed(2);
+          calcChargeBarWidth(this.class);
+        }
+
         if(this.shotPower.toFixed(2) <= 3) {
           this.shotPower +=0.1;
         } else if (this.shotPower.toFixed > 3) {
@@ -870,6 +1065,13 @@ window.onload = () => {
         this.shootByFireType('lvlMax');
       }
       this.shotPower = defaultShotPower;
+      if(this.class === 'player1') {
+        p1ChargeBarStat = 0;
+        calcChargeBarWidth(this.class);
+      } else {
+        p2ChargeBarStat = 0;
+        calcChargeBarWidth(this.class);
+      }
     }
 
     shootByFireType(level) {
@@ -883,12 +1085,18 @@ window.onload = () => {
       new Bullet(xPos,yPos,level, this);
     }
 
-    gameOver() {
-      // TODO: What happens when a player dies?
-    }
+
   }
 
-
+  function calcChargeBarWidth(player) {
+    if (player === 'player1') {
+      const newP1Width = (p1ChargeBarStat/3.10)*100;
+      p1ChargeBarElement.setAttribute('style', `width:${newP1Width}%`)
+    } else {
+      const newP2Width = (p2ChargeBarStat/3.10)*100;
+      p2ChargeBarElement.setAttribute('style', `width:${newP2Width}%`)
+    }
+  }
 
 
   ///////////////////Bullet mechanics//////////////////////////////////////////
@@ -968,8 +1176,7 @@ window.onload = () => {
         const initialEnemyLifePoints = enemy.lifePoints;
         enemy.lifePoints -= this.hitPoints;
         this.hitPoints -= initialEnemyLifePoints;
-        console.log(initialEnemyLifePoints);
-        console.log(this.hitPoints);
+
         if (enemy.lifePoints <= 0) {
           this.player.score += enemy.score;
           updateScore(this.player);
@@ -1053,12 +1260,13 @@ window.onload = () => {
         case 'type7':
           this.positionFunction = this.updatePosition7;
           break;
+        case 'type8':
+          this.positionFunction = this.updatePosition8;
+          break;
       }
     }
 
     initialise() {
-      console.log(this.img);
-      console.log(this.height+'px');
       this.drone = document.createElement('div');
       this.drone.setAttribute('style', `top:${this.yPos}px; left:${this.xPos}px; width:${this.width}px; height:${this.height}px;`);
       this.drone.setAttribute('class', this.class);
@@ -1121,7 +1329,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos += 1;
         this.positionDOMElement();
-      } else if (this.xPos > this.width) {
+      } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos -= 1;
         this.positionDOMElement();
@@ -1137,7 +1345,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos -= 1;
         this.positionDOMElement();
-      } else if (this.xPos > this.width) {
+      } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos += 1;
         this.positionDOMElement();
@@ -1208,6 +1416,26 @@ window.onload = () => {
 
     updatePosition6() {
       //starting xPos is 1000
+      //starting xPos is 1000
+      if (this.xPos > 550) {
+        this.xPos -= 1;
+        this.positionDOMElement();
+      } else if (this.xPos > 400) {
+        this.xPos -= 1;
+        this.yPos += .3;
+        this.positionDOMElement();
+      } else if (this.xPos > -this.width) {
+        this.xPos -= 1;
+        this.yPos += .5;
+        this.positionDOMElement();
+      } else {
+        return false;
+      }
+      return true;
+    }
+
+    updatePosition7() {
+      //starting xPos is 1000
       if (this.yPos < 300 - this.width) {
         this.yPos += 1;
         this.xPos += 0.2;
@@ -1222,7 +1450,7 @@ window.onload = () => {
       return true;
     }
 
-    updatePosition7() {
+    updatePosition8() {
       //starting xPos is 1000
       if (this.lifePoints > 100 && this.xPos >= 0) {
         this.xPos -= 0.2;
@@ -1257,24 +1485,34 @@ window.onload = () => {
     createEnemiesOfClass('type3', 8, 0);
     createEnemiesOfClass('type4', 8, 5000);
     createEnemiesOfClass('type3', 8, 10000);
-    createEnemiesOfClass('type4', 8, 14000);
-    createEnemiesOfClass('type3', 8,20000);
-    createEnemiesOfClass('type5', 14,25000);
-    createEnemiesOfClass('type4', 8,30000);
-    createEnemiesOfClass('type6', 14,350000);
-    createEnemiesOfClass('type1', 8, 40000);
+    createEnemiesOfClass('type4', 8, 15000);
+    createEnemiesOfClass('type5', 8,20000);
+    createEnemiesOfClass('type6', 14,20500);
+    createEnemiesOfClass('type7', 8,30000);
+    createEnemiesOfClass('type3', 14,350000);
+    createEnemiesOfClass('type1', 5, 40000);
+    createEnemiesOfClass('type2', 2, 42000);
+    createEnemiesOfClass('type1', 3, 48000);
     // Delay for each wave
 
     // Wave 2
     levelTimeouts.push(setTimeout(function() {
-      createEnemiesOfClass('type2', 8,0);
+      createEnemiesOfClass('type7', 12,0);
       createEnemiesOfClass('type3', 10,8000);
-      createEnemiesOfClass('type4', 8,10000);
-      createEnemiesOfClass('type1', 14, 15000);
+      createEnemiesOfClass('type1', 8,10000);
+      createEnemiesOfClass('type2', 2, 15000);
       createEnemiesOfClass('type6', 8,20000);
-      createEnemiesOfClass('type2', 14,27000);
+      createEnemiesOfClass('type7', 12,27000);
       createEnemiesOfClass('type3', 8,35000);
-    }, 45000)); //Delay for each wave
+      createEnemiesOfClass('type4', 8,40000);
+      createEnemiesOfClass('type2', 8,50000);
+    }, 50000)); //Delay for each wave
+
+    levelTimeouts.push(setTimeout(function() {
+      if(!gameOverScreen) {
+        gameOver('You survived the battle! Great work!');
+      }
+    }, 100000));
 
   // wave3();
   }
@@ -1296,8 +1534,15 @@ window.onload = () => {
   //////////////////////////Start Game///////////////////////////////////////////
 
 
-  const resetButton = document.getElementsByClassName('reset')[0];
-  resetButton.addEventListener('click',resetGame);
+  function gameOver(phrase) {
+    // TODO: What happens when a player dies?
+    if (player2ModeActive === false) {
+      createGameOverScreen(phrase);
+    } else if (player1Lives === 0 && player2Lives === 0) {
+      createGameOverScreen(phrase);
+    }
+  }
+
 
   function resetGame() {
     gameActive = false;
@@ -1317,6 +1562,9 @@ window.onload = () => {
       playingField.parentNode.removeChild(playingField);
       player1Sound.setAttribute('src','');
       player2Sound.setAttribute('src','');
+    }
+    if(gameOverScreen) {
+      gameOverScreen.parentNode.removeChild(gameOverScreen);
     }
     //need to clear screen
     //empty the player arrays and enemy arrays(?);
