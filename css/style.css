@@ -31,6 +31,7 @@ body {
   right: -120px;
   top: 360px;
   animation: planetMovement 120s linear forwards;
+  z-index: 1;
 }
 .planet2 {
   position: absolute;
@@ -39,6 +40,7 @@ body {
   right: 100px;
   top: 100px;
   animation: planetMovement 180s linear forwards;
+    z-index: 0;
 }
 
 @keyframes planetMovement {
@@ -351,8 +353,10 @@ font-family: 'Monoton', cursive; */
 
 .lvl1,.lvl2, .lvl3, .lvlMax{
   position: absolute;
+  z-index:2
 }
 
 .type1, .type2, .type3, .type4, .type5, .type6,.type7, .type8, .type9 {
   position: absolute;
+  z-index: 1;
 }

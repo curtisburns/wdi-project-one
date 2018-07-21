@@ -1530,7 +1530,7 @@ window.onload = () => {
       if(!gameOverScreen) {
         gameOver('You survived the battle! Great work!');
       }
-    }, 110000));
+    }, 114000));
 
   // wave3();
   }
