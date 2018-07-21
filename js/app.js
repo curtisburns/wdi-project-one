@@ -1004,7 +1004,9 @@ window.onload = () => {
           removeInterval(hit);
           if(_this.checkLives() > 0) {
             createPlayer(_this.class, _this);
-          } else {
+          } else if (player2ModeActive === false) {
+            gameOver('Game over');
+          } else if (player1Lives === 0 && player2Lives === 0) {
             gameOver('Game over');
           }
         }
@@ -1560,11 +1562,7 @@ window.onload = () => {
 
   function gameOver(phrase) {
     // TODO: What happens when a player dies?
-    if (player2ModeActive === false) {
       createGameOverScreen(phrase);
-    } else if (player1Lives === 0 && player2Lives === 0) {
-      createGameOverScreen(phrase);
-    }
   }
 
 
