@@ -339,6 +339,7 @@ window.onload = () => {
   let p2ChargeBarElement;
   let planet1;
   let planet2;
+  let foreground;
 
   function startGame() {
     playerSelectScreen.parentNode.removeChild(playerSelectScreen);
@@ -365,6 +366,11 @@ window.onload = () => {
     planet2.setAttribute('class','planet2');
     planet2.setAttribute('src', './images/planet2.png');
     playingField.appendChild(planet2);
+
+    foreground = document.createElement('img');
+    foreground.setAttribute('class','foreground');
+    foreground.setAttribute('src', './images/spaceforeground.png');
+    playingField.appendChild(foreground);
 
     setTimeout(startWaves, 1000);
     createPlayer('player1');

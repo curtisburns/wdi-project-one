@@ -26,10 +26,10 @@ body {
 
 .planet1 {
   position: absolute;
-  width: 120px;
-  height: 100px;
+  width: 200px;
+  height: 160px;
   right: -120px;
-  top: 360px;
+  top: 290px;
   animation: planetMovement 120s linear forwards;
   z-index: 1;
 }
@@ -38,14 +38,29 @@ body {
   width: 300px;
   height: 300px;
   right: 100px;
-  top: 100px;
+  top: 50px;
   animation: planetMovement 180s linear forwards;
-    z-index: 0;
+  z-index: 0;
+}
+
+.foreground {
+  position: absolute;
+  right: -200px;
+  height:110px;
+  bottom: 0;
+  animation: foregroundMovement .2s linear infinite;
+  z-index: 0;
 }
 
 @keyframes planetMovement {
   100% {
     right: 1600px;
+  }
+}
+
+@keyframes foregroundMovement {
+  100% {
+    right: -80px;
   }
 }
 
