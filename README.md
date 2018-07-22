@@ -46,6 +46,7 @@ ___
 
 Having decided to do either a Flappy Bird type game or an R-type inspired spaceship game, I began my first hour or so practicing how to get a square to move around on my screen. Once I achieved this, more and more ideas for the spaceship game kept coming to me, so I went ahead with that. I also thought it was a game that I would personally enjoy playing more. I quickly realised that trying to get all of my ideas into the game within the week would be a challenge, so I had to be disciplined and make sure I prioritised those features that were vital to the functionality of the game.
 
+___
 ## Wins
 
 The way I had written the code meant for easy customisation of the games mechanics and level creation. I learnt so much about the value of writing code with convenience in mind. If you ask yourself questions such as:
