@@ -1562,7 +1562,7 @@ window.onload = () => {
 
   function gameOver(phrase) {
     // TODO: What happens when a player dies?
-      createGameOverScreen(phrase);
+    createGameOverScreen(phrase);
   }
 
 
