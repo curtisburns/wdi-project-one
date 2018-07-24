@@ -726,7 +726,7 @@ window.onload = () => {
     return collidedObjects;
   }
 
-  window.addEventListener('keydown', e => {
+  body.addEventListener('keydown', e => {
     e.preventDefault();
 
 
@@ -799,7 +799,7 @@ window.onload = () => {
     });
 
 
-  window.addEventListener('keyup', e => {
+  body.addEventListener('keyup', e => {
     switch(e.key) {
       case 'w':
         stopMovement(0, 'up');
