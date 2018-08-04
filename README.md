@@ -15,19 +15,17 @@ pilot, you are entrusted with the impressive SpaceZ PFS and must destroy as many
 of those who threaten our peaceful existence as possible, before they destroy
 us! We will be praying for your success! Good luck!
 
-  ![Character Select Screen](./ReadMe-Images/CharSelect.png)
+![Character Select Screen](./ReadMe-Images/CharSelect.png)
 
-  1. Decide whether to fly solo or partner up
+  1. Decide whether to fly solo or partner up and select your ship
 
-  2. Select your ship
+![Gameplay](https://gph.is/2nciYWk.gif | width=700)
 
-![Gameplay](https://media.giphy.com/media/NsKhmlFhbChhpMDXGW/giphy.gif)
-
-  3. Wreak havoc on your enemies
+  2. Wreak havoc on your enemies
 
 ![Game Over Screen](./ReadMe-Images/GameOver.png)
 
-  4. Survive!
+  3. Survive!
 ___
 
 ## Technologies used
