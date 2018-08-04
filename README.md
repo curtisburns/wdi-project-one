@@ -21,7 +21,7 @@ us! We will be praying for your success! Good luck!
 
   2. Select your ship
 
-![Gameplay](./ReadMe-Images/Battle.png)
+![Gameplay](https://gph.is/2nciYWk.gif)
 
   3. Wreak havoc on your enemies
 
