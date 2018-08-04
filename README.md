@@ -19,7 +19,7 @@ us! We will be praying for your success! Good luck!
 
   1. Decide whether to fly solo or partner up and select your ship
 
-![Gameplay](https://media.giphy.com/media/NsKhmlFhbChhpMDXGW/giphy.gif | width=700)
+![Gameplay](https://media.giphy.com/media/NsKhmlFhbChhpMDXGW/giphy.gif)
 
   2. Wreak havoc on your enemies
 
