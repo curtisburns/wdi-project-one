@@ -1,5 +1,5 @@
 # Galactic Assembly Arcade Game
-![Intro Screen](./ReadMe-Images/Intro.png)
+![Intro Screen](https://media.giphy.com/media/1jY6KtGXraEWPUNv78/giphy.gif)
 
 [Play the Galactic Assembly Arcade Game on GitHub Pages](https://curtisburns.github.io/wdi-project-one/)
 
