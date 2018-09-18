@@ -1,5 +1,8 @@
 # Galactic Assembly Arcade Game
-![Intro Screen](https://media.giphy.com/media/1jY6KtGXraEWPUNv78/giphy.gif)
+
+<p align="center">
+  <img width="800" height="550" alt="Intro Screen" src="https://media.giphy.com/media/1jY6KtGXraEWPUNv78/giphy.gif">
+</p>
 
 [Play the Galactic Assembly Arcade Game on GitHub Pages](https://curtisburns.github.io/wdi-project-one/)
 
@@ -18,8 +21,10 @@ us! We will be praying for your success! Good luck!
 ![Character Select Screen](./ReadMe-Images/CharSelect.png)
 
   1. Decide whether to fly solo or partner up and select your ship
-
-![Gameplay](https://media.giphy.com/media/NsKhmlFhbChhpMDXGW/giphy.gif)
+  
+<p align="center">
+  <img width="800" height="550" alt="Gameplay" src="https://media.giphy.com/media/NsKhmlFhbChhpMDXGW/giphy.gif">
+</p>
 
   2. Wreak havoc on your enemies
 
