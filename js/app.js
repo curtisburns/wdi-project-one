@@ -3,47 +3,22 @@ window.onload = () => {
 
 
 ///////////NOTES//////////////
-//known issues//
-
-//at the moment, as score is tied to player object, you will lose all points on death, need to detach from object or find a way to store score from previous life.
-
-// initial lives keeps being applied to the new player, doesn't go zero
-
-
-//cannot remove from arrays now. filter does not work.
-//need to fix detect interval as I cannot clear it currently
-//player2 bulletdetect not working.
-
-// if i change overflow from hidden, now and then an enemy will not be removed from the game.
-
-//player1color is not being defined.
-
-//if player spams bullets at high rate, cannot remove drone. this
-//is because the detection rate is too slow and two bullets can enter the position of the drone
-//and therefore function tries to remove the same drone twice. increase detection rate? tried, still happens
-
-//when using 2nd player, charging, moving forward and moving down does not move down.
-//setTimeout on waves needs to be removed on reset.
-//need to fix charge- DONE
 
 //p1 and p2 bullets can be refactored in same way as movement.*********
-//need to add differentiation for bullets. i.e width and height. -DONE
-//need to add a few more enemy types
-//need to add boss.
-//need player to fly in from left on respawn
-//need intro and player select.
-//need different bullets for each character (color) maybe a different max? Like extra wide, or narrow and high hitpoints
-//set speed as variable/property for each type of enemy.
-//set speed as property for layers
+// TODO: Add boss
+// TODO: Player to fly in from left on respawn
+// TODO: need different bullets for each character (color) maybe a different max? Like extra wide, or narrow and high hitpoints
 
-//////////////////////////////
+
+///////////// GAME SETUP /////////////////
   const gameHeight = 600;
   const gameWidth = 1000; //can use this in calculations below - still need to refactor.
   const backgroundMusic = document.getElementsByClassName('background-music')[0];
   const player1Sound = document.getElementsByClassName('player1sound')[0];
   const player2Sound = document.getElementsByClassName('player2sound')[0];
   const enemySound = document.getElementsByClassName('enemysound')[0];
-  ///////////creategame////////////
+
+  /////////// CREATE GAME ////////////
   const body = document.getElementsByTagName('body')[0];
   const game = document.createElement('div');
   game.setAttribute('class','game');
@@ -57,7 +32,7 @@ window.onload = () => {
   game.appendChild(arcadeImg);
   /////////////////////////////////////////
 
-  //////////createIntro/////////
+  //////////CREATE INTRO SCREEN/////////
 
   const introScreen = document.createElement('div');
   introScreen.setAttribute('class','introScreen');
@@ -99,6 +74,8 @@ window.onload = () => {
   aHole.setAttribute('style', 'left: 287px; top: 362px; width: 36px; height: 36px;');
   introScreen.appendChild(aHole);
 
+  // INTRO ANIMATION SETUP
+
   setTimeout(function() {
     const startGameButton = document.createElement('div');
     startGameButton.setAttribute('class','start-game-button');
@@ -124,8 +101,9 @@ window.onload = () => {
     }, 2500); //2500
   }, 4500); //4500
   /////////////////////////////////////////////////
-  ////////////player selection/startgame///////////////
-  let player2ModeActive = false; //will be included in intro so player can select.
+
+  ////////////CREATE PLAYER SELECTION/START GAME SCREEN///////////////
+  let player2ModeActive = false; //This can be changed in player select
   let player1Color = 1;
   let player2Color = 2;
   let char1Image;
@@ -175,12 +153,12 @@ window.onload = () => {
     playerSelectScreen.appendChild(player1SelectLeft );
 
     player1SelectLeft.addEventListener('click', p1CycleLeft);
+    player1SelectLeft.addEventListener('keydown', p1CycleLeft);
 
     player1SelectRight = document.createElement('div');
     player1SelectRight.setAttribute('class','player1SelectRight');
     player1SelectRight.setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; right:${gameWidth-350}px; background:   url(images/arrowright.png) center/160%`);
     playerSelectScreen.appendChild(player1SelectRight );
-
 
     player1SelectRight.addEventListener('click', p1CycleRight);
 
