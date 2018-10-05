@@ -33,8 +33,9 @@ window.onload = () => {
   /////////////////////////////////////////
 
   //////////CREATE INTRO SCREEN/////////
+  let introScreen;
 
-  const introScreen = document.createElement('div');
+  introScreen = document.createElement('div');
   introScreen.setAttribute('class','introScreen');
   introScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
   game.appendChild(introScreen);
@@ -75,9 +76,11 @@ window.onload = () => {
   introScreen.appendChild(aHole);
 
   //////// INTRO ANIMATION SETUP
+  let startGameButton;
+  let canPressStart = false;
 
   setTimeout(function() {
-    const startGameButton = document.createElement('div');
+    startGameButton = document.createElement('div');
     startGameButton.setAttribute('class','start-game-button');
     startGameButton.setAttribute('style', 'left: 360px; top: 530px;');
     startGameButton.textContent = 'insert bit coin';
@@ -86,20 +89,26 @@ window.onload = () => {
     setTimeout(function() {
       startGameButton.textContent = 'start game';
       startGameButton.addEventListener('click', endIntro);
-      function endIntro() {
-        startGameButton.removeEventListener('click', endIntro);
-        backgroundMusic.setAttribute('src', './sounds/Daft Punk  The Glitch Mob - Tron Legacy Reconfigured.mp3');
-        backgroundMusic.play();
-        backgroundMusic.loop = true;
-        aHole.classList.add('animate-a-hole');
-        setTimeout(function() {
-          startGameButton.addEventListener('click', endIntro);
-          createSelectionScreen();
-          introScreen.parentNode.removeChild(introScreen);
-        },1000);
-      }
+      canPressStart = true;
     }, 2500); //2500
   }, 4500); //4500
+
+  function endIntro() {
+    if (introScreen && canPressStart) {
+      canPressStart = false;
+      startGameButton.removeEventListener('click', endIntro);
+      backgroundMusic.setAttribute('src', './sounds/Daft Punk  The Glitch Mob - Tron Legacy Reconfigured.mp3');
+      backgroundMusic.play();
+      backgroundMusic.loop = true;
+      aHole.classList.add('animate-a-hole');
+      setTimeout(function() {
+        startGameButton.addEventListener('click', endIntro);
+        createSelectionScreen();
+        introScreen.parentNode.removeChild(introScreen);
+        introScreen = null;
+      }, 1000);
+    }
+  }
   /////////////////////////////////////////////////
 
   ////////////CREATE PLAYER SELECTION/START GAME SCREEN///////////////
@@ -189,34 +198,40 @@ window.onload = () => {
   }
 
   function p1CycleLeft() {
-    if(player1Color-1 < 1) {
-      player1Color=5;
-      char1Image.setAttribute('src', `images/ship${player1Color}.png`);
-    } else {
-      player1Color-=1;
-      char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+    if (playerSelectScreen) {
+      if(player1Color-1 < 1) {
+        player1Color=5;
+        char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+      } else {
+        player1Color-=1;
+        char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+      }
     }
   }
 
   function p1CycleRight() {
-    if(player1Color+1 > 5) {
-      player1Color=1;
-      char1Image.setAttribute('src', `images/ship${player1Color}.png`);
-    } else {
-      player1Color+=1;
-      char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+    if (playerSelectScreen) {
+      if(player1Color+1 > 5) {
+        player1Color=1;
+        char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+      } else {
+        player1Color+=1;
+        char1Image.setAttribute('src', `images/ship${player1Color}.png`);
+      }
     }
   }
 
   ////// PLAYER 2 MODE ///////
 
   function player2Active() {
-    if(player2ModeActive) {
-      player2ModeActive = false;
-      removePlayer2Options();
-    } else {
-      player2ModeActive = true;
-      showPlayer2Options();
+    if (playerSelectScreen) {
+      if(player2ModeActive) {
+        player2ModeActive = false;
+        removePlayer2Options();
+      } else {
+        player2ModeActive = true;
+        showPlayer2Options();
+      }
     }
   }
 
@@ -225,6 +240,7 @@ window.onload = () => {
   let player2SelectRight;
   let player2Heading;
   let player2Instructions;
+  let char2Image;
 
   function showPlayer2Options() {
     player2Mode .textContent = '2 Players';
@@ -238,7 +254,7 @@ window.onload = () => {
     player2Character.setAttribute('class','player2Character');
     player2Character.setAttribute('style', `width: 200px; height: 100px; top:${(gameHeight/2)-50}px; left:${gameWidth-300}px;`);
     playerSelectScreen.appendChild(player2Character);
-    const char2Image = document.createElement('img');
+    char2Image = document.createElement('img');
     char2Image.setAttribute('src', `images/ship${player2Color}.png`);
     char2Image.setAttribute('style', 'width: 160px; height: 55px');
     player2Character.appendChild(char2Image);
@@ -257,7 +273,16 @@ window.onload = () => {
 
     player2SelectLeft.addEventListener('click', p2CycleLeft);
 
-    function p2CycleLeft() {
+    player2SelectRight = document.createElement('div');
+    player2SelectRight .setAttribute('class','player2SelectRight');
+    player2SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; left:${gameWidth-100}px; background:   url(images/arrowright.png) center/160%`);
+    playerSelectScreen.appendChild(player2SelectRight );
+
+    player2SelectRight.addEventListener('click', p2CycleRight);
+  }
+
+  function p2CycleLeft() {
+    if (playerSelectScreen && player2ModeActive) {
       if(player2Color-1 < 1) {
         player2Color= 5;
         char2Image.setAttribute('src', `images/ship${player2Color}.png`);
@@ -266,15 +291,10 @@ window.onload = () => {
         char2Image.setAttribute('src', `images/ship${player2Color}.png`);
       }
     }
+  }
 
-    player2SelectRight = document.createElement('div');
-    player2SelectRight .setAttribute('class','player2SelectRight');
-    player2SelectRight .setAttribute('style', `width: 40px; height: 50px; top:${gameHeight/2-25}px; left:${gameWidth-100}px; background:   url(images/arrowright.png) center/160%`);
-    playerSelectScreen.appendChild(player2SelectRight );
-
-    player2SelectRight.addEventListener('click', p2CycleRight);
-
-    function p2CycleRight() {
+  function p2CycleRight() {
+    if (playerSelectScreen && player2ModeActive) {
       if(player2Color+1 > 5) {
         player2Color=1;
         char2Image.setAttribute('src', `images/ship${player2Color}.png`);
@@ -337,45 +357,49 @@ window.onload = () => {
 
   function startGame() {
     // INITIATE GAME HUD
-    playerSelectScreen.parentNode.removeChild(playerSelectScreen);
-    playingField = document.createElement('div');
-    playingField.setAttribute('class','playingField');
-    playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px; background: url(./images/spacebackground.png) center/cover`);
-    game.appendChild(playingField);
-    removeScorePanels();
-    insertScorePanels();
-    insertResetButton();
-    removeLifePanels();
-    insertLifePanels();
-    removeChargeBars();
-    insertChargeBars();
-    gameActive = true;
+    if (playerSelectScreen) {
+      playerSelectScreen.parentNode.removeChild(playerSelectScreen);
+      playerSelectScreen = null;
+      playingField = document.createElement('div');
+      playingField.setAttribute('class','playingField');
+      playingField.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px; background: url(./images/spacebackground.png) center/cover`);
+      game.appendChild(playingField);
+      removeScorePanels();
+      insertScorePanels();
+      insertResetButton();
+      removeLifePanels();
+      insertLifePanels();
+      removeChargeBars();
+      insertChargeBars();
+      gameActive = true;
 
-    //// CREATE BACKGROUND AND FOREGROUND /////
-    planet1 = document.createElement('img');
-    planet1.setAttribute('class','planet1');
-    planet1.setAttribute('src', './images/planet1.png');
-    playingField.appendChild(planet1);
+      //// CREATE BACKGROUND AND FOREGROUND /////
+      planet1 = document.createElement('img');
+      planet1.setAttribute('class','planet1');
+      planet1.setAttribute('src', './images/planet1.png');
+      playingField.appendChild(planet1);
 
 
-    planet2 = document.createElement('img');
-    planet2.setAttribute('class','planet2');
-    planet2.setAttribute('src', './images/planet2.png');
-    playingField.appendChild(planet2);
+      planet2 = document.createElement('img');
+      planet2.setAttribute('class','planet2');
+      planet2.setAttribute('src', './images/planet2.png');
+      playingField.appendChild(planet2);
 
-    foreground = document.createElement('img');
-    foreground.setAttribute('class','foreground');
-    foreground.setAttribute('src', './images/spaceforeground.png');
-    playingField.appendChild(foreground);
+      foreground = document.createElement('img');
+      foreground.setAttribute('class','foreground');
+      foreground.setAttribute('src', './images/spaceforeground.png');
+      playingField.appendChild(foreground);
 
-    //// START ENEMY WAVES AND SPAWN PLAYER(S)
-    setTimeout(startWave, 1000);
-    createPlayer('player1');
-    updateScore(getCurrentPlayer(1));
-    if (player2ModeActive === true) {
-      createPlayer('player2');
-      updateScore(getCurrentPlayer(2));
+      //// START ENEMY WAVES AND SPAWN PLAYER(S)
+      setTimeout(startWave, 1000);
+      createPlayer('player1');
+      updateScore(getCurrentPlayer(1));
+      if (player2ModeActive === true) {
+        createPlayer('player2');
+        updateScore(getCurrentPlayer(2));
+      }
     }
+
   }
 
   function insertScorePanels() {
@@ -498,7 +522,7 @@ window.onload = () => {
 
   // TODO: Add powerups that effect shot power
   let defaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time; Keep as let
-  let gameActive = true;
+  let gameActive = false;
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
   let player2;
@@ -725,17 +749,26 @@ window.onload = () => {
   // KEY DOWN CONTROLS - INITIATES INTERVALS
   body.addEventListener('keydown', e => {
     e.preventDefault();
-
+    console.log(e.key);
     switch(e.key) {
+      case ' ':
+        startGame();
+        endIntro();
+        break;
+      case 'r':
+        resetGame();
+        break;
       case 'a':
         if (a === false) {
           startMovement(0, 'left');
+          p1CycleLeft();
         }
         a = true;
         break;
       case 'd':
         if (d === false) {
           startMovement(0, 'right');
+          p1CycleRight();
         }
         d = true;
         break;
@@ -752,7 +785,7 @@ window.onload = () => {
         s = true;
         break;
       case 'v':
-        if(getCurrentPlayer(1).alive === true) {
+        if(getCurrentPlayer(1) && getCurrentPlayer(1).alive === true) {
           if (p1TriggerPulled === false) {
             getCurrentPlayer(1).chargeShot();
           }
@@ -762,12 +795,14 @@ window.onload = () => {
       case 'ArrowLeft':
         if (ArrowLeft === false) {
           startMovement(1, 'left');
+          p2CycleLeft();
         }
         ArrowLeft = true;
         break;
       case 'ArrowRight':
         if (ArrowRight === false) {
           startMovement(1, 'right');
+          p2CycleRight();
         }
         ArrowRight = true;
         break;
@@ -784,7 +819,7 @@ window.onload = () => {
         ArrowDown = true;
         break;
       case 'm':
-        if(getCurrentPlayer(2).alive === true) {
+        if(getCurrentPlayer(2) && getCurrentPlayer(2).alive === true) {
           if (p2TriggerPulled === false) {
             getCurrentPlayer(2).chargeShot();
           }
@@ -815,7 +850,7 @@ window.onload = () => {
         s = false;
         break;
       case 'v':
-        if(getCurrentPlayer(1).alive === true) {
+        if(getCurrentPlayer(1) && getCurrentPlayer(1).alive === true) {
           getCurrentPlayer(1).fireShot();
           p1TriggerPulled = false;
         }
@@ -837,7 +872,7 @@ window.onload = () => {
         ArrowDown = false;
         break;
       case 'm':
-        if(getCurrentPlayer(2).alive === true) {
+        if(getCurrentPlayer(2) && getCurrentPlayer(2).alive === true) {
           getCurrentPlayer(2).fireShot();
           p2TriggerPulled = false;
         }
@@ -1579,28 +1614,30 @@ window.onload = () => {
 
 
   function resetGame() {
-    gameActive = false;
-    createSelectionScreen();
-    enemiesInPlay = [];
-    player1Record = [];
-    player2Record = [];
-    initialPlayerLives = 3;
-    player1Lives = 3;
-    player2Lives = 3;
-    player2ModeActive = false;
-    levelTimeouts.forEach(timeout => clearTimeout(timeout));
-    levelTimeouts = [];
-    levelIntervals.forEach(interval => removeInterval(interval));
-    levelIntervals = [];
-    waveNumber = 1;
-    if (playingField) {
-      playingField.parentNode.removeChild(playingField);
-      player1Sound.setAttribute('src','');
-      player2Sound.setAttribute('src','');
-    }
-    if(gameOverScreen) {
-      gameOverScreen.parentNode.removeChild(gameOverScreen);
-      gameOverScreen = null;
+    if(gameOverScreen || gameActive) {
+      gameActive = false;
+      createSelectionScreen();
+      enemiesInPlay = [];
+      player1Record = [];
+      player2Record = [];
+      initialPlayerLives = 3;
+      player1Lives = 3;
+      player2Lives = 3;
+      player2ModeActive = false;
+      levelTimeouts.forEach(timeout => clearTimeout(timeout));
+      levelTimeouts = [];
+      levelIntervals.forEach(interval => removeInterval(interval));
+      levelIntervals = [];
+      waveNumber = 1;
+      if (playingField) {
+        playingField.parentNode.removeChild(playingField);
+        player1Sound.setAttribute('src','');
+        player2Sound.setAttribute('src','');
+      }
+      if(gameOverScreen) {
+        gameOverScreen.parentNode.removeChild(gameOverScreen);
+        gameOverScreen = null;
+      }
     }
   }
 };
