@@ -749,7 +749,6 @@ window.onload = () => {
   // KEY DOWN CONTROLS - INITIATES INTERVALS
   body.addEventListener('keydown', e => {
     e.preventDefault();
-    console.log(e.key);
     switch(e.key) {
       case ' ':
         startGame();
@@ -791,6 +790,9 @@ window.onload = () => {
           }
           p1TriggerPulled = true;
         }
+        break;
+      case 'Shift':
+        player2Active();
         break;
       case 'ArrowLeft':
         if (ArrowLeft === false) {
