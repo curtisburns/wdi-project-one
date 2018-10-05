@@ -74,7 +74,7 @@ window.onload = () => {
   aHole.setAttribute('style', 'left: 287px; top: 362px; width: 36px; height: 36px;');
   introScreen.appendChild(aHole);
 
-  // INTRO ANIMATION SETUP
+  //////// INTRO ANIMATION SETUP
 
   setTimeout(function() {
     const startGameButton = document.createElement('div');
@@ -103,22 +103,23 @@ window.onload = () => {
   /////////////////////////////////////////////////
 
   ////////////CREATE PLAYER SELECTION/START GAME SCREEN///////////////
-  let player2ModeActive = false; //This can be changed in player select
+
+  let playerSelectScreen;
+  let selectMode;
+  let createStartMissionButton;
+  let startMission;
+
   let player1Color = 1;
   let player2Color = 2;
   let char1Image;
-  let player2Mode;
-  let playerSelectScreen;
   let player1Heading;
   let player1Character;
   let player1SelectLeft;
   let player1SelectRight;
-  let selectMode;
-  let createStartMissionButton;
-  let startMission;
   let player1Instructions;
 
-
+  let player2ModeActive = false; //This can be changed in player select
+  let player2Mode;
 
   function createSelectionScreen() {
     playerSelectScreen = document.createElement('div');
@@ -207,6 +208,8 @@ window.onload = () => {
     }
   }
 
+  ////// PLAYER 2 MODE ///////
+
   function player2Active() {
     if(player2ModeActive) {
       player2ModeActive = false;
@@ -289,24 +292,39 @@ window.onload = () => {
     player2SelectRight.parentNode.removeChild(player2SelectRight);
     player2Heading.parentNode.removeChild(player2Heading);
   }
-  ///createplayingField////////////
+
+  /////////////////////////   CREATE PLAYING FIELD   ///////////////////////
+
+  // NOTES
+
+  // Elements are inserted and removed as the game starts and resets
 
   let playingField;
-  let scorePanel1;
-  let scorePanel2;
-  let livesPanel1;
-  let livesPanel2;
-  let p1Score;
-  let p2Score;
-  let p1Lives;
-  let p2Lives;
+
+
   let resetButton;
   let gameOverScreen;
+  let planet1;
+  let planet2;
+  let foreground;
+
+  let livesPanel1;
+  let livesPanel2;
+  let p1Lives;
+  let p2Lives;
+
+  const lifeLossPenalty = 1000;
   let initialPlayerLives = 3;
   let player1Lives = initialPlayerLives;
   let player2Lives = initialPlayerLives;
+
+  let scorePanel1;
+  let scorePanel2;
+  let p1Score;
+  let p2Score;
   let player1Record = [];
   let player2Record = [];
+
   let p1ChargeBarStat;
   let p2ChargeBarStat;
   let p1ChargeBarContainer;
@@ -315,11 +333,10 @@ window.onload = () => {
   let p2ChargeBarFill;
   let p1ChargeBarElement;
   let p2ChargeBarElement;
-  let planet1;
-  let planet2;
-  let foreground;
+
 
   function startGame() {
+    // INITIATE GAME HUD
     playerSelectScreen.parentNode.removeChild(playerSelectScreen);
     playingField = document.createElement('div');
     playingField.setAttribute('class','playingField');
@@ -333,7 +350,8 @@ window.onload = () => {
     removeChargeBars();
     insertChargeBars();
     gameActive = true;
-    playingField = document.getElementsByClassName('playingField')[0];
+
+    //// CREATE BACKGROUND AND FOREGROUND /////
     planet1 = document.createElement('img');
     planet1.setAttribute('class','planet1');
     planet1.setAttribute('src', './images/planet1.png');
@@ -350,7 +368,8 @@ window.onload = () => {
     foreground.setAttribute('src', './images/spaceforeground.png');
     playingField.appendChild(foreground);
 
-    setTimeout(startWaves, 1000);
+    //// START ENEMY WAVES AND SPAWN PLAYER(S)
+    setTimeout(startWave, 1000);
     createPlayer('player1');
     updateScore(getCurrentPlayer(1));
     if (player2ModeActive === true) {
@@ -376,7 +395,7 @@ window.onload = () => {
   }
 
   function removeScorePanels() {
-    if(scorePanel1 && scorePanel2) {
+    if(scorePanel1 && scorePanel2 && scorePanel1.parentNode && scorePanel2.parentNode) {
       scorePanel1.parentNode.removeChild(scorePanel1);
       scorePanel2.parentNode.removeChild(scorePanel2);
     }
@@ -413,38 +432,17 @@ window.onload = () => {
       p2ChargeBarContainer.appendChild(p2ChargeBarFill);
 
       p2ChargeBarElement = document.getElementsByClassName('p2ChargeBar')[0];
-      console.log(p1ChargeBarElement);
     }
   }
 
   function removeChargeBars() {
-    if(p1ChargeBarContainer) {
+    if(p1ChargeBarContainer && p1ChargeBarContainer.parentNode) {
       p1ChargeBarContainer.parentNode.removeChild(p1ChargeBarContainer);
     }
-    if(p2ChargeBarContainer) {
+    if(p2ChargeBarContainer && p2ChargeBarContainer.parentNode) {
       p2ChargeBarContainer.parentNode.removeChild(p2ChargeBarContainer);
     }
   }
-
-
-  function createGameOverScreen(phrase) {
-    gameOverScreen = document.createElement('div');
-    gameOverScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
-    gameOverScreen.setAttribute('class', 'gameover');
-    gameOverScreen.innerHTML = `<p class="gameover-text">${phrase}</p>`;
-    game.appendChild(gameOverScreen);
-
-  //   score
-  //
-  //   const whoWins = document.createElement('div');
-  //   whoWins.setAttribute('style', 'width: 300px; height: 100px;');
-  //   whoWins.setAttribute('class', 'whoWins');
-  //   whoWins.innerHTML = `<p>Player ${highestScorer} wins!</p><p>Score: ${highestScore}>`;
-  //   gameOverScreen.appendChild(whoWins);
-  //
-  }
-
-
 
   function insertLifePanels() {
     livesPanel1 = document.createElement('div');
@@ -466,17 +464,16 @@ window.onload = () => {
     }
   }
 
-
-
   function removeLifePanels() {
-    if(livesPanel1) {
+    if(livesPanel1 && livesPanel1.parentNode) {
       livesPanel1.parentNode.removeChild(livesPanel1);
     }
-    if(livesPanel2) {
+    if(livesPanel2 && livesPanel2.parentNode) {
       livesPanel2.parentNode.removeChild(livesPanel2);
     }
   }
 
+  // Updates lives left
   function updateLifePanels(player) {
     if (player.class === 'player1') {
 
@@ -484,24 +481,29 @@ window.onload = () => {
     } else p2Lives.textContent = player2Lives;
   }
 
+  function createGameOverScreen(phrase) {
+    gameOverScreen = document.createElement('div');
+    gameOverScreen.setAttribute('style', `width: ${gameWidth}px; height:${gameHeight}px;`);
+    gameOverScreen.setAttribute('class', 'gameover');
+    gameOverScreen.innerHTML = `<p class="gameover-text">${phrase}</p>`;
+    game.appendChild(gameOverScreen);
+  }
 
 
+  /////////////////// PLAYER AND ENEMY STATS ////////////////////
 
-  //   ////////////////Declarations///////////////////////
-
-
-
-
-
-
+  // This keeps tabs on the enemies in play so that they can be positioned
+  // and removed from play
   let enemiesInPlay = [];
 
-
-  let defaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time;
+  // TODO: Add powerups that effect shot power
+  let defaultShotPower = 0; //This can be used to effect powerUps e.g 3 for a period of time; Keep as let
   let gameActive = true;
   //These is declared as let as they are rassigned when they have been removed from DOM
   let player1;
   let player2;
+
+  ///// PLAYER CONFIG /////
 
   const players = {
     player1: {
@@ -527,6 +529,7 @@ window.onload = () => {
     }
   };
 
+  ////// BULLET CONFIG ////////
   const fireType = {
     lvl1: {
       hitPoints: 1,
@@ -566,6 +569,7 @@ window.onload = () => {
     }
   };
 
+  ////// ENEMY CONFIG ///////
   // TODO:Must add more enemy waves and boss
   const enemyTypes = {
     type1: {
@@ -579,6 +583,7 @@ window.onload = () => {
       imgWidth: 100,
       imgHeight: 100
     },
+
     type2: {
       x: 1000,
       y: 575,
@@ -590,6 +595,7 @@ window.onload = () => {
       imgWidth: 100,
       imgHeight: 100
     },
+
     type3: {
       x: 1000,
       y: 100,
@@ -601,6 +607,7 @@ window.onload = () => {
       imgWidth: 50,
       imgHeight: 50
     },
+
     type4: {
       x: 1000,
       y: 400,
@@ -612,6 +619,7 @@ window.onload = () => {
       imgWidth: 50,
       imgHeight: 50
     },
+
     type5: {
       x: 1000,
       y: 250,
@@ -647,7 +655,8 @@ window.onload = () => {
       imgWidth: 50,
       imgHeight: 50
     },
-    //need to finish - boss?
+
+    //need to finish - BOSS
     type8: {
       x: 1000,
       y: 250,
@@ -662,21 +671,9 @@ window.onload = () => {
   };
   /////////////////////////////////////////////////
 
-  //   //////////////////////////player 1 & 2 controls//////////////////////
-  const movementIntervals = [{}, {}];
+  ////////////////////////// COLLISION DETECTION //////////////////////////////
 
-
-  let ArrowLeft = false;
-  let ArrowRight = false;
-  let ArrowUp = false;
-  let ArrowDown = false;
-  let p1TriggerPulled = false;
-  let w = false;
-  let a = false;
-  let s = false;
-  let d = false;
-  let p2TriggerPulled = false;
-
+  ///// COLLISION DETECTION FUNCTION
   function objectsCollide(obj1, obj2) {
     const obj1Left = obj1.xPos;
     const obj1Top = obj1.yPos;
@@ -687,6 +684,7 @@ window.onload = () => {
     const obj2Top = obj2.yPos;
     const obj2Right = obj2.xPos + obj2.width;
     const obj2Bottom = obj2.yPos + obj2.height;
+
     const collides =  (obj1Right > obj2Left) &&
       (obj1Left < obj2Right) &&
       (obj1Bottom > obj2Top) &&
@@ -694,6 +692,7 @@ window.onload = () => {
     return collides;
   }
 
+  //// CHECKS THE COLLISION POTENTIAL FOR EVERY ELEMENT IN PLAY (objArray)
   function objectCollidesWithAny(obj1, objArray) {
     const collidedObjects = [];
     for(let i = 0; i < objArray.length; i++) {
@@ -704,28 +703,35 @@ window.onload = () => {
     return collidedObjects;
   }
 
+  ////////////////////  PLAYER 1 & 2 CONTROLS AND MOVEMENT //////////////////
+
+  //BOOLEANS NECESSARY TO PREVENT DUPLICATE SETINTERVALS
+  let ArrowLeft = false;
+  let ArrowRight = false;
+  let ArrowUp = false;
+  let ArrowDown = false;
+  let w = false;
+  let a = false;
+  let s = false;
+  let d = false;
+  let p1TriggerPulled = false;
+  let p2TriggerPulled = false;
+
+  //Had to remap p1Trigger from C to V as keyboard doesn't allow keypress of
+  //both C, D and any others together - because they're the same column maybe?
+
+  //ALIVE SWITCH PREVENTS MOVEMENT ERRORS DURING DEATH AND CONTINUED CHARGING
+
+  // KEY DOWN CONTROLS - INITIATES INTERVALS
   body.addEventListener('keydown', e => {
     e.preventDefault();
 
-
     switch(e.key) {
-      case 'w':
-        if (w === false) {
-          startMovement(0, 'up');
-        }
-        w = true;
-        break;
       case 'a':
         if (a === false) {
           startMovement(0, 'left');
         }
         a = true;
-        break;
-      case 's':
-        if (s === false) {
-          startMovement(0, 'down');
-        }
-        s = true;
         break;
       case 'd':
         if (d === false) {
@@ -733,7 +739,19 @@ window.onload = () => {
         }
         d = true;
         break;
-      case 'c':
+      case 'w':
+        if (w === false) {
+          startMovement(0, 'up');
+        }
+        w = true;
+        break;
+      case 's':
+        if (s === false) {
+          startMovement(0, 'down');
+        }
+        s = true;
+        break;
+      case 'v':
         if(getCurrentPlayer(1).alive === true) {
           if (p1TriggerPulled === false) {
             getCurrentPlayer(1).chargeShot();
@@ -773,29 +791,30 @@ window.onload = () => {
           p2TriggerPulled = true;
         }
         break;
-      }
-    });
+    }
+  });
 
-
+  // KEY UP CONTROLS - REMOVES INTERVALS
   body.addEventListener('keyup', e => {
     switch(e.key) {
-      case 'w':
-        stopMovement(0, 'up');
-        w = false;
-        break;
       case 'a':
         stopMovement(0, 'left');
         a = false;
+        break;
+
+      case 'd':
+        stopMovement(0, 'right');
+        d = false;
+        break;
+      case 'w':
+        stopMovement(0, 'up');
+        w = false;
         break;
       case 's':
         stopMovement(0, 'down');
         s = false;
         break;
-      case 'd':
-        stopMovement(0, 'right');
-        d = false;
-        break;
-      case 'c':
+      case 'v':
         if(getCurrentPlayer(1).alive === true) {
           getCurrentPlayer(1).fireShot();
           p1TriggerPulled = false;
@@ -827,7 +846,13 @@ window.onload = () => {
     }
   });
 
+  // MOVEMENT FUNCTIONALITY
+
+  // {} FOR EACH PLAYER
+  const movementIntervals = [{}, {}];
+
   function startMovement(playerNumber, direction) {
+
     const interval = movementIntervals[playerNumber][direction];
     if (!interval) {
       movementIntervals[playerNumber][direction] = newInterval(() => movePlayer(playerNumber, direction), 10);
@@ -842,11 +867,11 @@ window.onload = () => {
     }
   }
 
-  // window.addEventListener('keydown', p1CheckKeyDown);
+  // SWITCH DETERMINES THE FUNCTION ACCORDING TO DIRECTION
   function movePlayer(playerNumber, direction) {
     const player = getCurrentPlayer(playerNumber + 1);
     //check for if player exists(could be between lives)
-    if(player.playerElement) {
+    if(player && player.playerElement) {
       switch(direction) {
         case 'right':
           movePlayerRight(player);
@@ -864,6 +889,7 @@ window.onload = () => {
     }
   }
 
+  // DIRECTION FUNCTIONALITY
   function movePlayerRight(player) {
     if(player.xPos < 1000-player.width) {
       player.xPos+=player.moveSpeed;
@@ -893,8 +919,7 @@ window.onload = () => {
     }
   }
 
-
-  //////////////////////score/////////////////////////
+  //////////////////////////////////  SCORE    /////////////////////////////////
   function updateScore(player) {
     const scoreCount = player.score;
     //Dom Element
@@ -903,14 +928,9 @@ window.onload = () => {
     const inputScore = '0'.repeat(6-scoreCountString.length) + scoreCountString;
     score.textContent = inputScore;
   }
-  /////////////////////////////////////////////////////
 
 
-
-
-
-
-  ///////////////////////Player Creation////////////////////
+  ////////////////////////////// PLAYER CREATION ///////////////////////////////
   function getCurrentPlayer(playerNumber) {
     const playerRecord = playerNumber === 1 ? player1Record : player2Record;
     return playerRecord[playerRecord.length - 1];
@@ -948,6 +968,7 @@ window.onload = () => {
       this.initialise();
     }
 
+    //Brings player into existence and effects invincibility;
     initialise() {
       this.playerElement = document.createElement('div');
       this.playerElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px;`);
@@ -960,9 +981,6 @@ window.onload = () => {
       playerImage.setAttribute('style',`width: ${this.width}px;`);
       this.playerElement.appendChild(playerImage);
 
-      //for movement functions to target DOM element
-      this.class === 'player1' ? player1 = this.playerElement : player2 = this.playerElement;
-
       this.playerHitBox();
       const _this = this;
       levelTimeouts.push(setTimeout(function() {
@@ -971,6 +989,7 @@ window.onload = () => {
       },2000));
     }
 
+    //Attaches the collision detection to the player and handles death
     playerHitBox() {
       const _this = this;
       const hit = newInterval(function() {
@@ -991,6 +1010,33 @@ window.onload = () => {
       },5);
     }
 
+    checkEnemyCollision() {
+      if (!this.invincible) {
+        const enemiesHit = objectCollidesWithAny(this, enemiesInPlay);
+        for(let i = 0; i < enemiesHit.length; i++) {
+          this.handleEnemyHit(enemiesHit[i]);
+        }
+      }
+    }
+
+    handleEnemyHit() {
+      //DEATH AUDIO
+      this.identifySoundElement().setAttribute('src', 'sounds/enemydestroy.mp3');
+      this.identifySoundElement().play();
+      this.lifePoints -= 1;
+      this.alive = false;
+      //set position to null on death as enemys may continue to fly through and lower the score.
+      this.xPos = null;
+      this.yPos = null;
+      // Handles score on life loss;
+      this.score -= lifeLossPenalty;
+      if (this.score < 0) this.score = 0;
+      this.loseLife();
+      updateScore(this);
+      updateLifePanels(this);
+      removeInterval(this.chargeIntervalId);
+    }
+
     loseLife() {
       this.class === 'player1'? player1Lives-=1 : player2Lives-=1;
     }
@@ -1008,40 +1054,16 @@ window.onload = () => {
       }
     }
 
-    checkEnemyCollision() {
-      if (!this.invincible) {
-        const enemiesHit = objectCollidesWithAny(this, enemiesInPlay);
-        for(let i = 0; i < enemiesHit.length; i++) {
-          this.handleEnemyHit(enemiesHit[i]);
-        }
-      }
-    }
-
-    handleEnemyHit() {
-      this.identifySoundElement().setAttribute('src', 'sounds/enemydestroy.mp3');
-      this.identifySoundElement().play();
-      this.lifePoints -= 1;
-      this.alive = false;
-      //set position to null on death as enemys may continue to fly through and lower the score.
-      this.xPos = null;
-      this.yPos = null;
-
-      this.score -= 100;
-      if (this.score < 0) this.score = 0;
-      this.loseLife();
-      updateScore(this);
-      updateLifePanels(this);
-      removeInterval(this.chargeIntervalId);
-    }
 
     chargeShot() {
+      //CHARGE SHOT AUDIO
       this.identifySoundElement().setAttribute('src', 'sounds/chargesound.mp3');
       this.identifySoundElement().play();
       this.identifySoundElement().loop = true;
       this.identifySoundElement().volume = 0.5;
+
       this.chargeIntervalId = newInterval(() => {
         if (this.class === 'player1') {
-          console.log(p1ChargeBarStat);
           p1ChargeBarStat = this.shotPower.toFixed(2);
           calcChargeBarWidth(this.class);
         } else {
@@ -1068,6 +1090,7 @@ window.onload = () => {
       } else if(this.shotPower >= 3){
         this.shootByFireType('lvlMax');
       }
+      // Reset the shotPower and charge bar;
       this.shotPower = defaultShotPower;
       if(this.class === 'player1') {
         p1ChargeBarStat = 0;
@@ -1095,19 +1118,18 @@ window.onload = () => {
   function calcChargeBarWidth(player) {
     if (player === 'player1') {
       const newP1Width = (p1ChargeBarStat/3.10)*100;
-      p1ChargeBarElement.setAttribute('style', `width:${newP1Width}%`)
+      p1ChargeBarElement.setAttribute('style', `width:${newP1Width}%`);
     } else {
       const newP2Width = (p2ChargeBarStat/3.10)*100;
-      p2ChargeBarElement.setAttribute('style', `width:${newP2Width}%`)
+      p2ChargeBarElement.setAttribute('style', `width:${newP2Width}%`);
     }
   }
 
-
-  ///////////////////Bullet mechanics//////////////////////////////////////////
+  //////////////////////////// BULLET MECHANICS //////////////////////////////
 
   let p1Charge;
   let p2Charge;
-  let rateOfCharge = 50;
+  let rateOfCharge = 50; //(milliseconds)
 
   class Bullet{
     constructor(xPos, yPos, level, player) {
@@ -1129,6 +1151,7 @@ window.onload = () => {
       this.createDOMBullet();
     }
 
+    // Brings bullet into existence;
     createDOMBullet() {
       this.bulletElement = document.createElement('div');
       this.bulletElement.setAttribute('style', `top: ${this.yPos}px; left: ${this.xPos}px; width: ${this.width}px; height: ${this.height}px`);
@@ -1156,6 +1179,7 @@ window.onload = () => {
       const _this = this;
       this.travelInterval = newInterval(function () {
         _this.checkCollision();
+        //Checks if still on screen or has any hit points left, if no, remove
         const bulletStillInPlay = _this.xPos < 1000 && _this.hitPoints > 0;
         if(bulletStillInPlay) {
           _this.xPos += _this.speed;
@@ -1177,11 +1201,15 @@ window.onload = () => {
 
     handleEnemyHit(enemy) {
       if(enemy) {
+        //Life points before hit
         const initialEnemyLifePoints = enemy.lifePoints;
+
+        //Life points(enemy) and hit points(bullet) after hit
         enemy.lifePoints -= this.hitPoints;
         this.hitPoints -= initialEnemyLifePoints;
 
         if (enemy.lifePoints <= 0) {
+          //Add to score on enemy kill
           this.player.score += enemy.score;
           updateScore(this.player);
         }
@@ -1189,21 +1217,13 @@ window.onload = () => {
     }
   }
 
+  /////////////////////////// ENEMY CREATION ////////////////////////////////
 
+  const spawnRate = 1000; // (milliseconds);
+  let waveNumber = 1; //Starting wave number;
 
-
-
-  /////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-  //////////////////////////////enemy creation//////////////////////////////////
-
-
-  function createEnemiesOfClass(enemyClass, numberOfEnemies, delay) {
+  //SPAWNS ENEMIES - SEE LEVEL CREATION FOR EXAMPLE ON HOW TO USE
+  function createEnemiesOfType(enemyType, numberOfEnemies, delay, startNextWave, waveSelect) {
     levelTimeouts.push(setTimeout(function() {
       if(gameActive) {
         let i = numberOfEnemies;
@@ -1212,12 +1232,17 @@ window.onload = () => {
             removeInterval(releaseEnemy);
           } else if(i > 0) {
             i-=1;
-            const spawnedEnemy = new Enemy(enemyClass);
+            const spawnedEnemy = new Enemy(enemyType);
             enemiesInPlay.push(spawnedEnemy);
           } else {
             removeInterval(releaseEnemy);
+            //Optional, can be used to release next wave or end game;
+            if (startNextWave) {
+              waveNumber = waveSelect;
+              startWave();
+            }
           }
-        },1000 //reate at which enemies spawn
+        },spawnRate
         );
       }
     },delay
@@ -1225,9 +1250,9 @@ window.onload = () => {
   }
 
   class Enemy {
-    constructor(enemyClass) {
-      const enemy = enemyTypes[enemyClass];
-      this.class = enemyClass;
+    constructor(type) {
+      const enemy = enemyTypes[type];
+      this.class = type;
       this.xPos = enemy.x;
       this.yPos = enemy.y;
       this.lifePoints = enemy.lifePoints;
@@ -1241,6 +1266,8 @@ window.onload = () => {
       this.initialise();
     }
 
+    //UPDATE POSITION FUNCTIONS VARY BY ENEMY TYPE - THIS ASSIGNS THE CORRECT
+    //ONE TO 'THIS'
     setUpdatePositionFunction() {
       switch(this.class) {
         case 'type1':
@@ -1270,24 +1297,40 @@ window.onload = () => {
       }
     }
 
+    //Brings enemy into existence and initiates travel functionality
     initialise() {
-      this.drone = document.createElement('div');
-      this.drone.setAttribute('style', `top:${this.yPos}px; left:${this.xPos}px; width:${this.width}px; height:${this.height}px;`);
-      this.drone.setAttribute('class', this.class);
-      playingField.appendChild(this.drone);
+      this.enemyElement = document.createElement('div');
+      this.enemyElement.setAttribute('style', `top:${this.yPos}px; left:${this.xPos}px; width:${this.width}px; height:${this.height}px;`);
+      this.enemyElement.setAttribute('class', this.class);
+      playingField.appendChild(this.enemyElement);
 
-      this.droneImg = document.createElement('img');
-      this.droneImg.setAttribute('style',`width:${this.imgWidth}px; height:${this.imgHeight}px;`);
-      this.droneImg.setAttribute('src', `${this.img}`);
-      this.drone.appendChild(this.droneImg);
+      this.enemySprite = document.createElement('img');
+      this.enemySprite.setAttribute('style',`width:${this.imgWidth}px; height:${this.imgHeight}px;`);
+      this.enemySprite.setAttribute('src', `${this.img}`);
+      this.enemyElement.appendChild(this.enemySprite);
       this.travel();
     }
 
-    //***************//player1 collision//******************///
-    //Errors show as there is a gap between removing node and creating new one and collision detection cannot find any player element. This if statement fixes that (undefined is false).
+    // Handles travel, checks if enemy dead and if enemy has gone off screen,
+    // removes from DOM and removes enemy object if so
+    travel() {
+      const _this = this;
+      this.intervalId = newInterval(function() {
+        const positionWasUpdated = _this.positionFunction();
+        _this.removeIfDead();
+        if (!positionWasUpdated) {
+          if(playingField.children.length > 0) {
+            // Remove from enemiesInPlay
+            enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
+            _this.removeDOMElement();
+            removeInterval(this.intervalId);
+          }
+        }
+      },5); //has to be the same as the bullet check rate otherwise charged bullets will not work as intended.
+      levelIntervals.push(this.intervalId); //rate at which enemies move
+    }
 
-
-    isDead() {
+    removeIfDead() {
       if(this.lifePoints <= 0) {
         enemySound.setAttribute('src','sounds/enemydestroy.mp3');
         enemySound.volume = 0.5;
@@ -1298,41 +1341,26 @@ window.onload = () => {
     }
 
     removeDOMElement() {
-      if(this.drone.parentNode) {
-        this.drone.parentNode.removeChild(this.drone);
-        this.drone = null;
+      if(this.enemyElement.parentNode) {
+        this.enemyElement.parentNode.removeChild(this.enemyElement);
+        this.enemyElement = null;
       }
       removeInterval(this.intervalId);
     }
 
-    travel() {
-      const _this = this;
-      this.intervalId = newInterval(function() {
-        const positionWasUpdated = _this.positionFunction();
-        _this.isDead();
-        if (!positionWasUpdated) {
-          if(playingField.children.length > 0) {
-            // Remove from enemiesInPlay
-            enemiesInPlay = enemiesInPlay.filter(enemy => enemy !== _this);
-            _this.removeDOMElement();
-            removeInterval(this.intervalId);
-          }
-        }
-      },5); //has to be the same as the bullet check rate otherwise charge bullets will not work.
-      levelIntervals.push(this.intervalId); //rate at which enemies move
-    }
-
     positionDOMElement() {
-      this.drone.style.left = this.xPos + 'px';
-      this.drone.style.top = this.yPos + 'px';
+      this.enemyElement.style.left = this.xPos + 'px';
+      this.enemyElement.style.top = this.yPos + 'px';
     }
 
+    ///////// TRAVEL PATHS FOR EACH ENEMY
     updatePosition1() {
       //starting xPos is 1000
       if(this.xPos > 412.5) {
         this.xPos -= 1;
         this.yPos += 1;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos -= 1;
@@ -1349,6 +1377,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos -= 1;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos += 1;
@@ -1368,6 +1397,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos += .3;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos += .5;
@@ -1380,7 +1410,6 @@ window.onload = () => {
 
     updatePosition4() {
       //starting xPos is 1000
-      //starting xPos is 1000
       if (this.xPos > 550) {
         this.xPos -= 1;
         this.positionDOMElement();
@@ -1388,6 +1417,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos -= .3;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos -= .5;
@@ -1400,7 +1430,6 @@ window.onload = () => {
 
     updatePosition5() {
       //starting xPos is 1000
-      //starting xPos is 1000
       if (this.xPos > 550) {
         this.xPos -= 1;
         this.positionDOMElement();
@@ -1408,6 +1437,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos -= .3;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos -= .5;
@@ -1420,7 +1450,6 @@ window.onload = () => {
 
     updatePosition6() {
       //starting xPos is 1000
-      //starting xPos is 1000
       if (this.xPos > 550) {
         this.xPos -= 1;
         this.positionDOMElement();
@@ -1428,6 +1457,7 @@ window.onload = () => {
         this.xPos -= 1;
         this.yPos += .3;
         this.positionDOMElement();
+        //while still on screen
       } else if (this.xPos > -this.width) {
         this.xPos -= 1;
         this.yPos += .5;
@@ -1476,70 +1506,74 @@ window.onload = () => {
 
   }
 
+  /////////////////////////////// LEVEL SETTINGS //////////////////////////////
+
   let levelTimeouts = [];
 
-  //can setnumber of enemies as a variable at the top if needs be later.
-  function startWaves() {
+  function startWave() {
+    ///////////////// LEVEL CREATION ///////////////
 
-    //level creation
-    // numberOfEnemies, delay
+    // createEnemiesOfType(enemyType, numberOfEnemies, delay, startNextWave, waveSelect)
+    // e.g. createEnemiesOfType('type1', 5, 4000, [true], [2])
 
-    // Wave 1
-    // type5(1,0);
-    createEnemiesOfClass('type3', 8, 0);
-    createEnemiesOfClass('type4', 8, 5000);
-    createEnemiesOfClass('type3', 8, 10000);
-    createEnemiesOfClass('type4', 8, 15000);
-    createEnemiesOfClass('type5', 8,20000);
-    createEnemiesOfClass('type6', 14,20500);
-    createEnemiesOfClass('type7', 8,30000);
-    createEnemiesOfClass('type3', 14,350000);
-    createEnemiesOfClass('type1', 5, 40000);
-    createEnemiesOfClass('type2', 2, 42000);
-    createEnemiesOfClass('type1', 3, 48000);
-    // Delay for each wave
+    // TODO: Can now use the waveSelect functionality to create true levels and
+    // invoke screen prompts;
 
-    // Wave 2
-    levelTimeouts.push(setTimeout(function() {
-      createEnemiesOfClass('type7', 12,0);
-      createEnemiesOfClass('type3', 10,8000);
-      createEnemiesOfClass('type1', 8,10000);
-      createEnemiesOfClass('type2', 2, 15000);
-      createEnemiesOfClass('type6', 8,20000);
-      createEnemiesOfClass('type7', 12,27000);
-      createEnemiesOfClass('type3', 8,35000);
-      createEnemiesOfClass('type4', 8,40000);
-      createEnemiesOfClass('type2', 8,50000);
-    }, 50000)); //Delay for each wave
+    /////////// WAVE 1
+    if (waveNumber === 1) {
+      createEnemiesOfType('type3', 8, 0);
+      createEnemiesOfType('type4', 8, 5000);
+      createEnemiesOfType('type3', 8, 10000);
+      createEnemiesOfType('type4', 8, 15000);
+      createEnemiesOfType('type5', 8,20000);
+      createEnemiesOfType('type6', 14,20500);
+      createEnemiesOfType('type7', 8,30000);
+      createEnemiesOfType('type3', 14,350000);
+      createEnemiesOfType('type1', 5, 40000);
+      createEnemiesOfType('type2', 2, 42000);
+      createEnemiesOfType('type1', 3, 48000);
+      createEnemiesOfType('type1', 3, 48000, true, 2);
+    }
 
-    levelTimeouts.push(setTimeout(function() {
-      if(!gameOverScreen) {
+    /////////// WAVE 2
+    if (waveNumber === 2) {
+      createEnemiesOfType('type7', 12,0);
+      createEnemiesOfType('type3', 10,8000);
+      createEnemiesOfType('type1', 8,10000);
+      createEnemiesOfType('type2', 2, 15000);
+      createEnemiesOfType('type6', 8,20000);
+      createEnemiesOfType('type7', 12,27000);
+      createEnemiesOfType('type3', 8,35000);
+      createEnemiesOfType('type4', 8,40000);
+      createEnemiesOfType('type2', 8,50000, true, 'gameover');
+    }
+
+    /////////// GAMEOVER
+    if(!gameOverScreen && waveNumber === 'gameover') {
+      levelTimeouts.push(setTimeout(function() {
         gameOver('You survived the battle! Great work!');
-      }
-    }, 114000));
-
-  // wave3();
+      }, 5000));
+    }
   }
 
   let levelIntervals = [];
+
   function newInterval(intervalFunction, timeout) {
     const intervalId = setInterval(intervalFunction, timeout);
     levelIntervals.push(intervalId);
     return intervalId;
   }
+
   function removeInterval(intervalId) {
     clearInterval(intervalId);
     levelIntervals = levelIntervals.filter(i => i !== intervalId);
   }
-  //Below needs to be applied to the created enemy belonging to that object,
-  //so invoke on creation.
 
 
-  //////////////////////////Start Game///////////////////////////////////////////
+  //////////////////////////   RESET GAME  //////////////////////////////////
 
 
   function gameOver(phrase) {
-    // TODO: What happens when a player dies?
     createGameOverScreen(phrase);
   }
 
@@ -1558,6 +1592,7 @@ window.onload = () => {
     levelTimeouts = [];
     levelIntervals.forEach(interval => removeInterval(interval));
     levelIntervals = [];
+    waveNumber = 1;
     if (playingField) {
       playingField.parentNode.removeChild(playingField);
       player1Sound.setAttribute('src','');
@@ -1565,8 +1600,7 @@ window.onload = () => {
     }
     if(gameOverScreen) {
       gameOverScreen.parentNode.removeChild(gameOverScreen);
+      gameOverScreen = null;
     }
-    //need to clear screen
-    //empty the player arrays and enemy arrays(?);
   }
 };
