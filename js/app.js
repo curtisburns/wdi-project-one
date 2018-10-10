@@ -154,7 +154,7 @@ window.onload = () => {
     player1Instructions = document.createElement('div');
     player1Instructions.setAttribute('class','player1Instructions');
     player1Instructions.setAttribute('style', 'width: 300px; height: 100px;');
-    player1Instructions.innerHTML = '<p>WASD keys to move</p> <p>c to shoot/hold to charge shot</p>';
+    player1Instructions.innerHTML = '<p>WASD keys to move</p> <p>V to shoot/hold to charge shot</p>';
     playerSelectScreen.appendChild(player1Instructions);
 
     player1SelectLeft = document.createElement('div');
